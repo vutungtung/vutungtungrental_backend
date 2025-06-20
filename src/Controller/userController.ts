@@ -49,19 +49,13 @@ const getAllUserController = async (req: Request, res: Response) => {
   return;
 };
 
-// update User
+// update User from email
 
 const updateUserController = async (req: Request, res: Response) => {
   try {
     const { username, email, password } = req.body;
-    const userIdParam = req.params.userId || req.params.id; // adjust key as per your route
-    const userId = Number(userIdParam);
-    if (isNaN(userId)) {
-      res.status(400).json({ message: "Invalid user ID" });
-      return;
-    }
-    // console.log(userId);
-    const update = await updateUserModal(userId, { username, email, password });
+    const update = await updateUserModal({username,email,password});
+    console.log(update)
     res.status(200).json(update);
   } catch (err) {
     console.log(err);
@@ -74,7 +68,6 @@ const updateUserController = async (req: Request, res: Response) => {
 // delete user from email and password
 
 const deleteUserController = async (req: Request, res: Response) => {
-    
   try {
     const { email, password } = req.body;
     // finding the email in user table

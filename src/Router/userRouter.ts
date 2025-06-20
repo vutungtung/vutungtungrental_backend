@@ -5,7 +5,7 @@ const userRouter=Router()
 
 userRouter.post("/",createUserController)
 userRouter.get("/",getAllUserController)
-userRouter.put("/:id",updateUserController)
+userRouter.post("/updateuser",updateUserController)
 userRouter.post("/delete",deleteUserController)
 
 export {userRouter}
