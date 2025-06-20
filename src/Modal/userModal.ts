@@ -22,6 +22,22 @@ async function getALlUserMdoal() {
   const getusers = await prisma.user.findMany();
   return getusers;
 }
-
+async function updateUserModal(userId:number,data: {
+  username: string;
+  email: string;
+  password: string;
+}) {
+  const update = await prisma.user.update({
+    where: {
+      userId:userId,
+    },
+    data: {
+      username: data.username,
+      email: data.email,
+      password: data.password,
+    },
+  })
+  return update;
+}
 // exprt function
-export { createUser, getALlUserMdoal };
+export { createUser, getALlUserMdoal, updateUserModal };
