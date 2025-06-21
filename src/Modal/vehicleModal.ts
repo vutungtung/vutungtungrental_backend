@@ -67,3 +67,27 @@ export async function DeleteVehicle(id: number) {
   });
   return deletedVehicle;
 }
+
+// Get By Vehicle Name
+
+export async function GetVehicleByName(name: string) {
+  const data = await prisma.vehicle.findMany({
+    where: {
+      name: {
+        contains: name,
+
+        },
+    },
+  });
+  return data;
+}
+
+// Get Vehicle by categoryId
+export async function GetVehicleByCategoryId(categoryId: number) {
+  const data = await prisma.vehicle.findMany({
+    where: {
+      categoryId: categoryId,
+    },
+  });
+  return data;
+}

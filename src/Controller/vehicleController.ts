@@ -63,3 +63,35 @@ export async function deleteVehicle_Controller(req: Request, res: Response) {
     res.status(500).json({ error: "Failed to delete vehicle" });
   }
 }
+
+export async function getVehicleByName_Controller(req: Request, res: Response) {
+  const name = req.params.name;
+  try {
+    const vehicles = await GetVehicles();
+    const filteredVehicles = vehicles.filter(vehicle => 
+      vehicle.name && vehicle.name.toLowerCase().includes(name.toLowerCase())
+    );
+    if (filteredVehicles.length === 0) {
+      res.status(404).json({ error: "No vehicles found with that name" });
+      return;
+    }
+    res.status(200).json(filteredVehicles);
+  } catch (error) {
+    res.status(500).json({ error: "Failed to fetch vehicles" });
+  }
+}
+
+export async function GetVehicleByCategoryId_Controller(req: Request, res: Response) {
+  const categoryId = parseInt(req.params.categoryId);
+  try {
+    const vehicles = await GetVehicles();
+    const filteredVehicles = vehicles.filter(vehicle => vehicle.categoryId === categoryId);
+    if (filteredVehicles.length === 0) {
+      res.status(404).json({ error: "No vehicles found for this category" });
+      return;
+    }
+    res.status(200).json(filteredVehicles);
+  } catch (error) {
+    res.status(500).json({ error: "Failed to fetch vehicles" });
+  }
+}
