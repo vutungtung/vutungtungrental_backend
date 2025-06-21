@@ -25,9 +25,9 @@ async function getALlUserMdoal() {
 async function updateUserModal(
 
   data: {
-    email: string;
-    username: string;
-    password: string;
+    email?: string;
+    username?: string;
+    password?: string;
   }
 ) {
   const update = await prisma.user.updateMany({
