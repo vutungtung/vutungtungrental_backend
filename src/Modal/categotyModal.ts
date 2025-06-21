@@ -1,20 +1,20 @@
 import { prisma } from "../db";
 
-
 export async function CreateCategory(data: {
   name: string;
   description?: string;
   imageUrl?: string;
+  price: number;
 }) {
   return await prisma.category.create({
     data: {
       name: data.name,
-      description: data.description,
-      imageUrl: data.imageUrl,
+      description: data.description ?? "",
+      imageUrl: data.imageUrl ?? "",
+      price: data.price,
     },
- });
+  });
 }
-
 
 export async function GetCategories() {
   return await prisma.category.findMany();
@@ -42,6 +42,7 @@ export async function UpdateCategory(
     name?: string;
     description?: string;
     imageUrl?: string;
+    price: number;
   }
 ) {
   return await prisma.category.update({
@@ -52,6 +53,17 @@ export async function UpdateCategory(
       name: data.name,
       description: data.description,
       imageUrl: data.imageUrl,
+      price: data.price,
+    },
+  });
+}
+
+export async function GetCategoryByName(name: string) {
+  return await prisma.category.findMany({
+    where: {
+      name: {
+        contains: name,
+      },
     },
   });
 }

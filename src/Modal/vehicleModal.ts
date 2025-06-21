@@ -2,20 +2,23 @@ import { prisma } from "../db";
 
 // Create a new Vehicle
 export async function CreateVehicle(data: {
-  name?: string;
-  price?: number;
+  name: string;
+  price: number;
   description?: string;
   imageUrl?: string;
+  categoryId: number;
+  categoryName: string;
 }) {
-  const createVehicle = await prisma.vehicle.create({
+  return await prisma.vehicle.create({
     data: {
       name: data.name,
       price: data.price,
-      description: data.description,
-      imageUrl: data.imageUrl,
+      description: data.description ?? "",
+      imageUrl: data.imageUrl ?? "",
+      categoryId: data.categoryId,
+      categoryName: data.categoryName,
     },
   });
-  return createVehicle;
 }
 
 // Get all Vehicles
@@ -24,39 +27,36 @@ export async function GetVehicles() {
   return data;
 }
 
-// Get Vehicle by ID
-export async function GetVehicleById(id: number) {
-  const data = await prisma.vehicle.findUnique({
-    where: {
-      v_id: id,
-    },
-  });
-  return data;
-}
 
 // Update Vehicle
 export async function UpdateVehicle(
   id: number,
   data: {
     name?: string;
-    type?: string;
     price?: number;
-    location?: string;
     description?: string;
     imageUrl?: string;
+    categoryId?: number;
+    categoryName?: string;
   }
 ) {
+  const updateData: any = {};
+  
+  if (data.name !== undefined) updateData.name = data.name;
+  if (data.price !== undefined) updateData.price = data.price;
+  if (data.description !== undefined) updateData.description = data.description;
+  if (data.imageUrl !== undefined) updateData.imageUrl = data.imageUrl;
+  if (data.categoryId !== undefined) updateData.categoryId = data.categoryId;
+  if (data.categoryName !== undefined) updateData.categoryName = data.categoryName;
+
   const updatedVehicle = await prisma.vehicle.update({
     where: { v_id: id },
-    data: {
-      name: data.name,
-      price: data.price,
-      description: data.description,
-      imageUrl: data.imageUrl,
-    },
+    data: updateData,
   });
+
   return updatedVehicle;
 }
+
 
 // Delete Vehicle
 export async function DeleteVehicle(id: number) {
@@ -69,24 +69,36 @@ export async function DeleteVehicle(id: number) {
 }
 
 // Get By Vehicle Name
-
 export async function GetVehicleByName(name: string) {
   const data = await prisma.vehicle.findMany({
     where: {
       name: {
         contains: name,
-
-        },
+      },
     },
   });
   return data;
 }
 
-// Get Vehicle by categoryId
-export async function GetVehicleByCategoryId(categoryId: number) {
+// Get Vehicle by Category Name
+export async function GetVehicleByCategoryName(categoryName: string) {
   const data = await prisma.vehicle.findMany({
     where: {
-      categoryId: categoryId,
+      categoryName: {
+        contains: categoryName,
+      },
+    },
+  });
+  return data;
+}
+
+// Get Vehicle by Price
+export async function GetVehicleByPrice(price: number) {
+  const data = await prisma.vehicle.findMany({
+    where: {
+      price: {
+        gte: price,
+      },
     },
   });
   return data;

@@ -8,19 +8,23 @@ datasource db {
 }
 
 model Vehicle {
-  v_id        Int       @id @default(autoincrement())
-  name        String?
-  description String?
-  imageUrl    String?
-  price       Float?
-  categoryId  Int?
-  category    Category? @relation(fields: [categoryId], references: [c_id])
+  v_id         Int      @id @default(autoincrement())
+  name         String
+  description  String
+  imageUrl     String
+  price        Float
+  categoryId   Int
+  categoryName String
+  category     Category @relation(fields: [categoryId, categoryName], references: [c_id, name])
 }
 
 model Category {
   c_id        Int       @id @default(autoincrement())
-  name        String
-  description String?
-  imageUrl    String?
+  name        String    @unique
+  description String
+  imageUrl    String
+  price       Float
   vehicles    Vehicle[]
+
+  @@unique([c_id, name])
 }

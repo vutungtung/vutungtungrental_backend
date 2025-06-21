@@ -2,9 +2,11 @@ import { Request, Response } from "express";
 import {
   CreateVehicle,
   DeleteVehicle,
-  GetVehicleById,
   GetVehicles,
   UpdateVehicle,
+  GetVehicleByName,
+  GetVehicleByPrice,
+  GetVehicleByCategoryName,
 } from "../Modal/vehicleModal";
 
 export async function createVehicle_Controller(req: Request, res: Response) {
@@ -12,9 +14,11 @@ export async function createVehicle_Controller(req: Request, res: Response) {
     const vehicle = await CreateVehicle(req.body);
     res.status(201).json(vehicle);
   } catch (error) {
+    console.error("Error creating vehicle:", error);
     res.status(500).json({ error: "Failed to create vehicle" });
   }
 }
+
 export async function getVehicles_Controller(req: Request, res: Response) {
   try {
     const vehicles = await GetVehicles();
@@ -23,35 +27,44 @@ export async function getVehicles_Controller(req: Request, res: Response) {
     res.status(500).json({ error: "Failed to fetch vehicles" });
   }
 }
-export async function getVehicleById_Controller(req: Request, res: Response) {
-  const v_id = parseInt(req.params.v_id);
-  try {
-    const vehicle = await GetVehicleById(v_id);
-    if (!vehicle) {
-      res.status(404).json({ error: "Vehicle not found" });
-      return;
-    }
-    res.status(200).json(vehicle);
-  } catch (error) {
-    res.status(500).json({ error: "Failed to fetch vehicle" });
-  }
-}
+
 export async function updateVehicle_Controller(req: Request, res: Response) {
-  const v_id = parseInt(req.params.v_id);
+  const { v_id, name, description, imageUrl, price, categoryId, categoryName } =
+    req.body;
+
+  const vehicleId = parseInt(v_id);
+
+  if (isNaN(vehicleId)) {
+    res.status(400).json({ error: "Invalid Vehicle ID" });
+    return;
+  }
+
   try {
-    const updatedVehicle = await UpdateVehicle(v_id, req.body);
-    if (!updatedVehicle) {
-      res.status(404).json({ error: "Vehicle not found" });
-      return;
-    }
+    const updatedVehicle = await UpdateVehicle(vehicleId, {
+      name,
+      description,
+      imageUrl,
+      price,
+      categoryId,
+      categoryName,
+    });
+
     res.status(200).json(updatedVehicle);
-  } catch (error) {
-    res.status(500).json({ error: "Failed to update vehicle" });
+  } catch (error: any) {
+    console.error("Error updating vehicle:", error);
+    res
+      .status(500)
+      .json({ error: error.message || "Failed to update vehicle" });
   }
 }
 
 export async function deleteVehicle_Controller(req: Request, res: Response) {
-  const v_id = parseInt(req.params.v_id);
+  const v_id = parseInt(req.body.v_id);
+  if (isNaN(v_id)) {
+    res.status(400).json({ error: "Invalid vehicle ID" });
+    return;
+  }
+
   try {
     const vehicle = await DeleteVehicle(v_id);
     if (!vehicle) {
@@ -65,32 +78,62 @@ export async function deleteVehicle_Controller(req: Request, res: Response) {
 }
 
 export async function getVehicleByName_Controller(req: Request, res: Response) {
-  const name = req.params.name;
+  const { name } = req.body;
+  if (!name || typeof name !== "string") {
+    res.status(400).json({ error: "Invalid or missing vehicle name" });
+    return;
+  }
+
   try {
-    const vehicles = await GetVehicles();
-    const filteredVehicles = vehicles.filter(vehicle => 
-      vehicle.name && vehicle.name.toLowerCase().includes(name.toLowerCase())
-    );
-    if (filteredVehicles.length === 0) {
+    const vehicles = await GetVehicleByName(name);
+    if (vehicles.length === 0) {
       res.status(404).json({ error: "No vehicles found with that name" });
       return;
     }
-    res.status(200).json(filteredVehicles);
+    res.status(200).json(vehicles);
   } catch (error) {
     res.status(500).json({ error: "Failed to fetch vehicles" });
   }
 }
 
-export async function GetVehicleByCategoryId_Controller(req: Request, res: Response) {
-  const categoryId = parseInt(req.params.categoryId);
+export async function GetVehicleByCategoryName_Controller(
+  req: Request,
+  res: Response
+) {
+  const { categoryName } = req.body;
+  if (!categoryName || typeof categoryName !== "string") {
+    res.status(400).json({ error: "Invalid or missing category name" });
+    return;
+  }
+
   try {
-    const vehicles = await GetVehicles();
-    const filteredVehicles = vehicles.filter(vehicle => vehicle.categoryId === categoryId);
-    if (filteredVehicles.length === 0) {
+    const vehicles = await GetVehicleByCategoryName(categoryName);
+    if (vehicles.length === 0) {
       res.status(404).json({ error: "No vehicles found for this category" });
       return;
     }
-    res.status(200).json(filteredVehicles);
+    res.status(200).json(vehicles);
+  } catch (error) {
+    res.status(500).json({ error: "Failed to fetch vehicles" });
+  }
+}
+
+export async function GetVehicleByPrice_Controller(
+  req: Request,
+  res: Response
+) {
+  const price = parseFloat(req.body.price);
+  if (isNaN(price)) {
+    res.status(400).json({ error: "Invalid price value" });
+    return;
+  }
+
+  try {
+    const vehicles = await GetVehicleByPrice(price);
+    if (vehicles.length === 0) {
+      res.status(404).json({ error: "No vehicles found at this price" });
+    }
+    res.status(200).json(vehicles);
   } catch (error) {
     res.status(500).json({ error: "Failed to fetch vehicles" });
   }
