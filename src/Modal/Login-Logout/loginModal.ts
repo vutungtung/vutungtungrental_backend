@@ -2,6 +2,8 @@
 import { PrismaClient } from "../../generated/prisma"
 export const prisma =new PrismaClient()
 
+// store login details
+
 async function careeteLoginModal(data:{
     userId:number,
     refreshToken:string,
@@ -19,21 +21,25 @@ async function careeteLoginModal(data:{
     return createLogin
 }
 
+// check already login or not
+
 async function checkAlreadyLoggedIn(email: string) {
-  const findUser = await prisma.login.findMany({
+  const findUser = await prisma.login.findFirst({
     where: {
       email: email,
     },
   });
   return findUser;
 }
+// check user register already or not
 async function checkExistingUser(email: string,password:string) {
-  const findUser = await prisma.user.findMany({
+  const findUser = await prisma.user.findFirst({
     where: {
       email: email,
       password:password
     },
   });
+  console.log(findUser)
   return findUser;
 }
 

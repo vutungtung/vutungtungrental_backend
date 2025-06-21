@@ -6,25 +6,36 @@ import {
   checkAlreadyLoggedIn,
   checkExistingUser,
 } from "../../Modal/Login-Logout/loginModal";
+import { generateAccessToken, generateRefreshToken, Tokenload } from "../../Middleware/jwtToken";
+import { EXPIRE_ACCESS_TOKEN, EXPIRE_REFRESH_TOKEN } from "../../Middleware/expireTime";
 dotenv.config();
 const loginUser = async (req: Request, res: Response) => {
   try {
     const { email, password } = req.body;
 
     const user = await checkExistingUser(email, password);
+   console.log(user)
     if (!user) {
       res.status(401).json({
         message: "Incorrect email or password",
       });
+      return;
     }
+    const userId = user.userId;
     const loggedIn = await checkAlreadyLoggedIn(email);
+    console.log("user exist in login?",loggedIn)
     if (!loggedIn) {
-      const userId = user[0].userId;
+      const userPayload:Tokenload={
+        userId: user?.userId ?? ''
+      }
+      
+
 
       //    creating refresh token
-      const refreshToken = crypto.randomUUID();
+      const refreshToken = generateRefreshToken(userPayload);
 
-      const EXPIRE_REFRESH_TOKEN = 7 * 24 * 60 * 60;
+
+    //   const EXPIRE_REFRESH_TOKEN = 7 * 24 * 60 * 60;
       res.cookie("refresh_token", refreshToken, {
         path: "/",
         sameSite: "lax",
@@ -41,8 +52,8 @@ const loginUser = async (req: Request, res: Response) => {
         refreshToken,
       });
       //    creating Access token
-      const access_token = crypto.randomUUID();
-      const EXPIRE_ACCESS_TOKEN = 150;
+      const access_token = generateAccessToken(userPayload);
+    //   const EXPIRE_ACCESS_TOKEN = 150;
       res.cookie("access_token", access_token, {
         path: "/",
         secure: true,
@@ -63,3 +74,5 @@ const loginUser = async (req: Request, res: Response) => {
     });
   }
 };
+
+export{loginUser}
