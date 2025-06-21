@@ -3,18 +3,14 @@ import { prisma } from "../db";
 // Create a new Vehicle
 export async function CreateVehicle(data: {
   name?: string;
-  type?: string;
   price?: number;
-  location?: string;
   description?: string;
   imageUrl?: string;
 }) {
   const createVehicle = await prisma.vehicle.create({
     data: {
       name: data.name,
-      type: data.type,
       price: data.price,
-      location: data.location,
       description: data.description,
       imageUrl: data.imageUrl,
     },
@@ -54,9 +50,7 @@ export async function UpdateVehicle(
     where: { v_id: id },
     data: {
       name: data.name,
-      type: data.type,
       price: data.price,
-      location: data.location,
       description: data.description,
       imageUrl: data.imageUrl,
     },

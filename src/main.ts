@@ -1,15 +1,20 @@
 import express from "express";
 import dotenv from "dotenv";
 import { vehicleRouter } from "./Router/vehicleRouter";
+import { categoryRouter } from "./Router/categoryRouter";
 
-const app = express();
-const PORT = 4000;
 dotenv.config();
 
+
+const app = express();
+const PORT = process.env.PORT || 4000;
+
+// Must have JSON body parser middleware
 app.use(express.json());
 
 app.use("/api/vehicles", vehicleRouter);
+app.use("/api/category", categoryRouter);
 
-app.listen(process.env.PORT, () => {
-  console.log("You are on port number:", process.env.PORT || PORT);
+app.listen(PORT, () => {
+  console.log(`Server running on port: ${PORT}`);
 });

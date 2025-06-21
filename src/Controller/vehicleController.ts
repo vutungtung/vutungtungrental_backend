@@ -6,7 +6,6 @@ import {
   GetVehicles,
   UpdateVehicle,
 } from "../Modal/vehicleModal";
-import { prisma } from "../db";
 
 export async function createVehicle_Controller(req: Request, res: Response) {
   try {
