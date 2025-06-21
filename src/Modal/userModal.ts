@@ -23,20 +23,19 @@ async function getALlUserMdoal() {
   return getusers;
 }
 async function updateUserModal(
-  userId: number,
+
   data: {
-    username: string;
-    email: string;
-    password: string;
+    email?: string;
+    username?: string;
+    password?: string;
   }
 ) {
-  const update = await prisma.user.update({
+  const update = await prisma.user.updateMany({
     where: {
-      userId: userId,
+      email:data.email
     },
     data: {
       username: data.username,
-      email: data.email,
       password: data.password,
     },
   });
