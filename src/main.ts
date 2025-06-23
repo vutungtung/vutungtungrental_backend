@@ -7,7 +7,7 @@ import { vehicleRouter } from "./Router/vehicleRouter";
 import { categoryRouter } from "./Router/categoryRouter";
 const app=express();
 const PORT=4000;
-dotenv.config()
+dotenv.config();
 
 app.use(cookieParser())
 app.use(express.json())
