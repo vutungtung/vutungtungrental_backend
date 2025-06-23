@@ -7,6 +7,27 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model Vehicle {
+  v_id         Int      @id @default(autoincrement())
+  name         String
+  description  String
+  imageUrl     String
+  price        Float
+  categoryId   Int
+  categoryName String
+  category     Category @relation(fields: [categoryId, categoryName], references: [c_id, name])
+}
+
+model Category {
+  c_id        Int       @id @default(autoincrement())
+  name        String    @unique
+  description String
+  imageUrl    String
+  price       Float
+  vehicles    Vehicle[]
+
+  @@unique([c_id, name])
+}
 model User {
   userId    Int      @id @default(autoincrement())
   username  String  @unique
@@ -28,24 +49,4 @@ model Login {
   password String
 
   @@map("login")
-model Vehicle {
-  v_id         Int      @id @default(autoincrement())
-  name         String
-  description  String
-  imageUrl     String
-  price        Float
-  categoryId   Int
-  categoryName String
-  category     Category @relation(fields: [categoryId, categoryName], references: [c_id, name])
-}
-
-model Category {
-  c_id        Int       @id @default(autoincrement())
-  name        String    @unique
-  description String
-  imageUrl    String
-  price       Float
-  vehicles    Vehicle[]
-
-  @@unique([c_id, name])
 }
