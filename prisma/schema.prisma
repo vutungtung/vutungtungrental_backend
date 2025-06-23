@@ -7,6 +7,27 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model User {
+  userId    Int      @id @default(autoincrement())
+  username  String  @unique
+  email     String  @unique
+  password  String
+  createdAt DateTime @default(now())
+  updateAt  DateTime @default(now())
+  Login     Login[]
+
+  @@map("user")
+}
+
+model Login {
+  loginId Int  @id @default(autoincrement())
+  userId  Int
+  user    User @relation(fields: [userId], references: [userId])
+  refreshToken String
+  email String
+  password String
+
+  @@map("login")
 model Vehicle {
   v_id         Int      @id @default(autoincrement())
   name         String
