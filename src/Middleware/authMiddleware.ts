@@ -14,8 +14,15 @@ async function authenMiddleware(
   next: NextFunction
 ) {
   try {
+    // console.log("Cookies:", req.cookies["refresh_token"]);
+
+    // console.log("authmiddle ware")
+    // const cookie=req.cookies['refresh_token']
     const authenHeader =
       req.headers.authorization || req.cookies["refresh_token"];
+      // console.log(cookie)
+      // console.log(req.headers.authorization)
+      // console.log(authenHeader)
     if (!authenHeader) {
       res.status(401).json({
         message: "Token are not found in header",

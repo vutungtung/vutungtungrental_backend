@@ -9,10 +9,11 @@ import {
   GetVehicleByCategoryName_Controller,
   GetVehicleByPrice_Controller,
 } from "../Controller/vehicleController";
+import { authenMiddleware } from "../Middleware/authMiddleware";
 
 const vehicleRouter = Router();
 
-vehicleRouter.post("/create", createVehicle_Controller);
+vehicleRouter.post("/create",authenMiddleware,createVehicle_Controller);
 vehicleRouter.get("/", getVehicles_Controller);
 vehicleRouter.put("/update", updateVehicle_Controller);
 vehicleRouter.delete("/delete", deleteVehicle_Controller);

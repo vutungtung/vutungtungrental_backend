@@ -27,7 +27,9 @@ const loginUser = async (req: Request, res: Response) => {
     if (!loggedIn) {
       const userPayload:Tokenload={
         userId: user?.userId ?? ''
+        
       }
+     
       
 
 
@@ -64,10 +66,13 @@ const loginUser = async (req: Request, res: Response) => {
       res.status(200).json({
         message: "Logged In",
       });
-    }
+    
+    return
+  }
     res.status(401).json({
       message: "Cannot login twice",
     });
+    return
   } catch (err) {
     res.status(500).json({
       message: "Unable to login",
