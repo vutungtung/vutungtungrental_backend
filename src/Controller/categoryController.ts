@@ -9,7 +9,7 @@ import {
 import { json } from "stream/consumers";
 import { error } from "console";
 
-export async function CreateCategory_Conntroller(req: Request, res: Response) {
+export async function CreateCategoryConntroller(req: Request, res: Response) {
   const { name, description, imageUrl, price } = req.body;
   try {
     const category = await CreateCategory({
@@ -25,7 +25,7 @@ export async function CreateCategory_Conntroller(req: Request, res: Response) {
   }
 }
 
-export async function GetCategories_Controller(req: Request, res: Response) {
+export async function GetCategoriesController(req: Request, res: Response) {
   try {
     const categories = await GetCategories();
     res.status(200).json(categories);
@@ -35,7 +35,7 @@ export async function GetCategories_Controller(req: Request, res: Response) {
   }
 }
 
-export async function GetCategoryById_Controller(req: Request, res: Response) {
+export async function GetCategoryByIdController(req: Request, res: Response) {
   const { c_id } = req.body;
   const categoryId = parseInt(c_id);
 
@@ -57,7 +57,7 @@ export async function GetCategoryById_Controller(req: Request, res: Response) {
   }
 }
 
-export async function DeleteCategory_Controller(req: Request, res: Response) {
+export async function DeleteCategoryController(req: Request, res: Response) {
   const { c_id } = req.body;
   const categoryId = parseInt(c_id);
 
@@ -75,7 +75,7 @@ export async function DeleteCategory_Controller(req: Request, res: Response) {
   }
 }
 
-export async function UpdateCategory_Controller(req: Request, res: Response) {
+export async function UpdateCategoryController(req: Request, res: Response) {
   const { c_id, name, description, imageUrl, price } = req.body;
   const categoryId = parseInt(c_id);
 
@@ -98,7 +98,7 @@ export async function UpdateCategory_Controller(req: Request, res: Response) {
   }
 }
 
-export async function GetCategoryByName_Controller(
+export async function GetCategoryByNameController(
   req: Request,
   res: Response
 ) {

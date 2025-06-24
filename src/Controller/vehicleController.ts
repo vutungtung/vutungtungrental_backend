@@ -9,7 +9,7 @@ import {
   GetVehicleByCategoryName,
 } from "../Modal/vehicleModal";
 
-export async function createVehicle_Controller(req: Request, res: Response) {
+export async function createVehicleController(req: Request, res: Response) {
   try {
     const vehicle = await CreateVehicle(req.body);
     res.status(201).json(vehicle);
@@ -19,7 +19,7 @@ export async function createVehicle_Controller(req: Request, res: Response) {
   }
 }
 
-export async function getVehicles_Controller(req: Request, res: Response) {
+export async function getVehiclesController(req: Request, res: Response) {
   try {
     const vehicles = await GetVehicles();
     res.status(200).json(vehicles);
@@ -28,7 +28,7 @@ export async function getVehicles_Controller(req: Request, res: Response) {
   }
 }
 
-export async function updateVehicle_Controller(req: Request, res: Response) {
+export async function updateVehicleController(req: Request, res: Response) {
   const { v_id, name, description, imageUrl, price, categoryId, categoryName } =
     req.body;
 
@@ -58,7 +58,7 @@ export async function updateVehicle_Controller(req: Request, res: Response) {
   }
 }
 
-export async function deleteVehicle_Controller(req: Request, res: Response) {
+export async function deleteVehicleController(req: Request, res: Response) {
   const v_id = parseInt(req.body.v_id);
   if (isNaN(v_id)) {
     res.status(400).json({ error: "Invalid vehicle ID" });
@@ -77,7 +77,7 @@ export async function deleteVehicle_Controller(req: Request, res: Response) {
   }
 }
 
-export async function getVehicleByName_Controller(req: Request, res: Response) {
+export async function getVehicleByNameController(req: Request, res: Response) {
   const { name } = req.body;
   if (!name || typeof name !== "string") {
     res.status(400).json({ error: "Invalid or missing vehicle name" });
@@ -96,7 +96,7 @@ export async function getVehicleByName_Controller(req: Request, res: Response) {
   }
 }
 
-export async function GetVehicleByCategoryName_Controller(
+export async function GetVehicleByCategoryNameController(
   req: Request,
   res: Response
 ) {
@@ -118,7 +118,7 @@ export async function GetVehicleByCategoryName_Controller(
   }
 }
 
-export async function GetVehicleByPrice_Controller(
+export async function GetVehicleByPriceController(
   req: Request,
   res: Response
 ) {
