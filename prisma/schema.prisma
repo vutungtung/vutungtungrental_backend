@@ -1,12 +1,5 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
-  output   = "../src/generated/prisma"
 }
 
 datasource db {
@@ -14,11 +7,34 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model Vehicle {
+  v_id         Int      @id @default(autoincrement())
+  name         String
+  description  String
+  imageUrl     String
+  price        Float
+  categoryId   Int
+  categoryName String
+  category     Category @relation(fields: [categoryId, categoryName], references: [c_id, name])
+}
+
+model Category {
+  c_id        Int       @id @default(autoincrement())
+  name        String    @unique
+  description String
+  imageUrl    String
+  price       Float
+  vehicles    Vehicle[]
+
+  @@unique([c_id, name])
+}
+
 model User {
   userId    Int      @id @default(autoincrement())
-  username  String  @unique
-  email     String  @unique
+  username  String   @unique
+  email     String   @unique
   password  String
+  role      Role     @default(user)
   createdAt DateTime @default(now())
   updateAt  DateTime @default(now())
   Login     Login[]
@@ -26,13 +42,35 @@ model User {
   @@map("user")
 }
 
+model Admin {
+  adminId   Int      @id @default(autoincrement())
+  ownername String   @unique
+  email     String   @unique
+  passowrd  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt()
+  role      Role     @default(admin)
+  Login     Login[]
+
+  @@map("admin")
+}
+
+enum Role {
+  user
+  admin
+  superadmin
+}
+
 model Login {
-  loginId Int  @id @default(autoincrement())
-  userId  Int
-  user    User @relation(fields: [userId], references: [userId])
+  loginId      Int    @id @default(autoincrement())
+  userId       Int?
+  user         User?   @relation(fields: [userId], references: [userId])
+  adminId      Int?
+  admin        Admin?  @relation(fields: [adminId], references: [adminId])
   refreshToken String
-  email String
-  password String
+  email        String
+  password     String
+  role         Role
 
   @@map("login")
 }

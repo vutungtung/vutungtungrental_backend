@@ -3,3 +3,12 @@
 node_modules
 
 /src/generated/prisma
+
+// model BookingInfo {
+//   bookingId Int    @id @default(autoincrement())
+//   bookedBy  String
+//   email     String
+//   user      User   @relation(fields: [bookedBy, email], references: [username, email])
+//   ownername String
+//   owner     Admin  @relation(fields: [ownername], references: [ownername])
+// }

@@ -5,7 +5,7 @@ import { logoutUserController } from "../Controller/Login-Logout/logoutControlle
 const loginRouter=Router()
 const logoutRouter=Router()
 // user login
-loginRouter.post('/',authenMiddleware,loginUser)
+loginRouter.post('/',loginUser)
 // logout
 
 logoutRouter.post('/',logoutUserController)
