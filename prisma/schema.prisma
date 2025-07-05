@@ -28,11 +28,13 @@ model Category {
 
   @@unique([c_id, name])
 }
+
 model User {
   userId    Int      @id @default(autoincrement())
-  username  String  @unique
-  email     String  @unique
+  username  String   @unique
+  email     String   @unique
   password  String
+  role      Role     @default(user)
   createdAt DateTime @default(now())
   updateAt  DateTime @default(now())
   Login     Login[]
@@ -40,13 +42,35 @@ model User {
   @@map("user")
 }
 
+model Admin {
+  adminId   Int      @id @default(autoincrement())
+  ownername String   @unique
+  email     String   @unique
+  passowrd  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt()
+  role      Role     @default(admin)
+  Login     Login[]
+
+  @@map("admin")
+}
+
+enum Role {
+  user
+  admin
+  superadmin
+}
+
 model Login {
-  loginId Int  @id @default(autoincrement())
-  userId  Int
-  user    User @relation(fields: [userId], references: [userId])
+  loginId      Int    @id @default(autoincrement())
+  userId       Int?
+  user         User?   @relation(fields: [userId], references: [userId])
+  adminId      Int?
+  admin        Admin?  @relation(fields: [adminId], references: [adminId])
   refreshToken String
-  email String
-  password String
+  email        String
+  password     String
+  role         Role
 
   @@map("login")
 }

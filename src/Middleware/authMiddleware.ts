@@ -4,7 +4,10 @@ import { EXPIRE_ACCESS_TOKEN } from "./expireTime";
 
 declare module "express-serve-static-core" {
   interface Request {
-    user?: any; // You can replace `any` with a specific type if you have one
+    user?: {
+      userId:number |string;
+      role:'user'| 'admin'
+    };
   }
 }
 
@@ -14,15 +17,8 @@ async function authenMiddleware(
   next: NextFunction
 ) {
   try {
-    // console.log("Cookies:", req.cookies["refresh_token"]);
-
-    // console.log("authmiddle ware")
-    // const cookie=req.cookies['refresh_token']
     const authenHeader =
       req.headers.authorization || req.cookies["refresh_token"];
-      // console.log(cookie)
-      // console.log(req.headers.authorization)
-      // console.log(authenHeader)
     if (!authenHeader) {
       res.status(401).json({
         message: "Token are not found in header",
@@ -46,7 +42,7 @@ async function authenMiddleware(
         })
         return
     }
-    const newAccessToken=generateAccessToken({userId:payload.userId})
+    const newAccessToken=generateAccessToken({userId:payload.userId ,role:payload.role})
         //  const EXPIRE_ACCESS_TOKEN = 150;
     res.cookie("access_token",newAccessToken,{
         path:'/',
@@ -54,7 +50,10 @@ async function authenMiddleware(
         secure:true,
         expires:new Date(Date.now() + EXPIRE_ACCESS_TOKEN * 1000)
     })
-    req.user=payload
+    req.user={
+      userId:payload.userId,
+      role:payload.role
+    }
     next()
   } catch(error) {
       console.error(error);

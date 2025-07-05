@@ -7,13 +7,20 @@ import {
   updateUserModal,
 } from "../Modal/userModal";
 import { Request, Response } from "express";
+import { createOwner } from "../Modal/adminModal";
+import { createAdmin } from "./adminController";
 
 // new user creation controller
 const createUserController = async (req: Request, res: Response) => {
   try {
-    const { username, email, password } = req.body;
-
-    const register = await createUser({ username, email, password });
+    const { username, email, password, role } = req.body;
+    if (role === "admin") {
+      console.log("this is entered rolle in userCOnyroller",role)
+      const registerasAdmin = await createAdmin( username,email,password, res);
+      return registerasAdmin;
+      
+    }
+    const register = await createUser({ username, email, password, role });
     if (!register) {
       res.status(404).json({
         message: "Unable to create check user input",
@@ -54,8 +61,8 @@ const getAllUserController = async (req: Request, res: Response) => {
 const updateUserController = async (req: Request, res: Response) => {
   try {
     const { username, email, password } = req.body;
-    const update = await updateUserModal({username,email,password});
-    console.log(update)
+    const update = await updateUserModal({ username, email, password });
+    console.log(update);
     res.status(200).json(update);
   } catch (err) {
     console.log(err);

@@ -1,24 +1,30 @@
 // import { PrismaClient } from "./generated/prisma";
-import { PrismaClient } from "../../generated/prisma"
-export const prisma =new PrismaClient()
+import { Role } from "@prisma/client";
+import { prisma } from "../../db";
 
 // store login details
 
-async function careeteLoginModal(data:{
-    userId:number,
-    refreshToken:string,
-    email:string,
-    password:string,
-}) {    
-    const createLogin=await prisma.login.create({
-        data:{
-            userId:data.userId,
-            refreshToken:data.refreshToken,
-            email:data.email,
-            password:data.password
-        }
-    })
-    return createLogin
+async function careeteLoginModal(data: {
+  adminId: number |null;
+  userId: number|null;
+  refreshToken: string;
+  email: string;
+  password: string;
+  role: Role;
+}) {
+  console.log("data in the model:",data.adminId,data.email)
+    const create= prisma.login.createMany({
+    data: {
+      userId: data.userId,
+      adminId: data.adminId,
+      refreshToken: data.refreshToken,
+      email: data.email,
+      password: data.password,
+      role: data.role,
+    },
+   
+  });
+  return create ;
 }
 
 // check already login or not
@@ -32,16 +38,35 @@ async function checkAlreadyLoggedIn(email: string) {
   return findUser;
 }
 // check user register already or not
-async function checkExistingUser(email: string,password:string) {
+async function checkExistingUser(email: string, password: string) {
   const findUser = await prisma.user.findFirst({
     where: {
       email: email,
-      password:password
+      password: password,
     },
   });
-  console.log(findUser)
+
+  console.log(findUser);
   return findUser;
 }
+async function checkExistingAdmin(email: string, password: string) {
+  const findAdmin = await prisma.admin.findFirst({
+    where: {
+      email: email,
+      passowrd: password,
+    },
+    select: {
+      adminId: true,
+    },
+  });
 
+  // console.log(findUser)
+  return findAdmin;
+}
 
-export{careeteLoginModal,checkAlreadyLoggedIn,checkExistingUser}
+export {
+  careeteLoginModal,
+  checkAlreadyLoggedIn,
+  checkExistingUser,
+  checkExistingAdmin,
+};
