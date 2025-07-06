@@ -5,17 +5,44 @@ async function createOwner(data: {
   username: string;
   email: string;
   password: string;
-
 }) {
-    console.log("data in modal:",data.email,data.username,data.password)
+  console.log("data in modal:", data.email, data.username, data.password);
   const newOwner = await prisma.admin.create({
     data: {
       ownername: data.username,
       email: data.email,
       passowrd: data.password,
-  
     },
   });
-  return newOwner
+  return newOwner;
 }
-export {createOwner}
+async function getAllAdmin() {
+  const getdata = await prisma.admin.findMany();
+  return getdata;
+}
+async function getSpecificAdmin(email?: string, ownername?: string) {
+  const findAdmin = await prisma.admin.findFirst({
+    where: {
+      email: email,
+      ownername: ownername,
+    },
+  });
+  return findAdmin;
+}
+async function updateAdmin(ownername?: string, email?: string,
+  passowrd?:string,
+  role?:Role
+) {
+  const update = await prisma.admin.update({
+    where: {
+      email: email,
+    },
+    data: {
+      ownername:ownername,
+      passowrd:passowrd,
+      role:role
+    },
+  });
+  return update
+}
+export { createOwner, getAllAdmin, getSpecificAdmin,updateAdmin };

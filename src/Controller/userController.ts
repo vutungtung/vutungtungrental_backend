@@ -7,7 +7,7 @@ import {
   updateUserModal,
 } from "../Modal/userModal";
 import { Request, Response } from "express";
-import { createOwner } from "../Modal/adminModal";
+import { createOwner, getSpecificAdmin, updateAdmin } from "../Modal/adminModal";
 import { createAdmin } from "./adminController";
 
 // new user creation controller
@@ -60,10 +60,31 @@ const getAllUserController = async (req: Request, res: Response) => {
 
 const updateUserController = async (req: Request, res: Response) => {
   try {
-    const { username, email, password } = req.body;
-    const update = await updateUserModal({ username, email, password });
+    const { username, email, password,ownername } = req.body;
+    const findUser=await getUserByEmail(email)
+    const findAdmin=await getSpecificAdmin(email)
+    if(findUser){
+     const update = await updateUserModal({ username, email, password });
     console.log(update);
-    res.status(200).json(update);
+    res.status(200).json({
+      message:"User Updated:",
+      data:update,
+      isSuccess:true
+    });
+    }else if(findAdmin){
+      const update=await updateAdmin(ownername,email,password)
+      res.status(200).json({
+        message:"Admin Updated",
+        data:update,
+        isSuccess:true
+      })
+      return
+    }
+    res.status(400).json({
+      message:"Unable to update ",
+      isSuccess:false
+    })
+   
   } catch (err) {
     console.log(err);
     res.status(500).json({
