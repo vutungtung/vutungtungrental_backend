@@ -63,10 +63,23 @@ async function checkExistingAdmin(email: string, password: string) {
   // console.log(findUser)
   return findAdmin;
 }
+async function checkformRefreshToken(refreshToken:string) {
+  const findemail=await prisma.login.findFirst({
+    where:{
+      refreshToken:refreshToken
+    },
+    select:{
+      email:true,
+      userId:true
+    }
+  })
+  
+}
 
 export {
   careeteLoginModal,
   checkAlreadyLoggedIn,
   checkExistingUser,
   checkExistingAdmin,
+  checkformRefreshToken
 };
