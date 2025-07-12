@@ -67,12 +67,9 @@ async function checkformRefreshToken(refreshToken:string) {
   const findemail=await prisma.login.findFirst({
     where:{
       refreshToken:refreshToken
-    },
-    select:{
-      email:true,
-      userId:true
     }
   })
+  return findemail
   
 }
 

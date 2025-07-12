@@ -6,14 +6,14 @@ async function createUser(data: {
   username: string;
   email: string;
   password: string;
-  role?:Role;
+  role?: Role;
 }) {
   const newUser = await prisma.user.create({
     data: {
       username: data.username,
       email: data.email,
       password: data.password,
-      role:data.role
+      role: data.role,
     },
   });
   return newUser;
@@ -24,17 +24,14 @@ async function getALlUserMdoal() {
   const getusers = await prisma.user.findMany();
   return getusers;
 }
-async function updateUserModal(
-
-  data: {
-    email?: string;
-    username?: string;
-    password?: string;
-  }
-) {
+async function updateUserModal(data: {
+  email?: string;
+  username?: string;
+  password?: string;
+}) {
   const update = await prisma.user.updateMany({
     where: {
-      email:data.email
+      email: data.email,
     },
     data: {
       username: data.username,
@@ -64,9 +61,6 @@ async function getUserByEmail(email: string) {
   });
   return findUser;
 }
-
-
-
 
 // exprt function
 export {

@@ -1,20 +1,20 @@
-import { DeliveryStatus, Payment } from "@prisma/client";
+import { DeliveryStatus, PayemntMethod, Payment } from "@prisma/client";
 import { prisma } from "../db";
 
 async function createBooking(data: {
   username: string;
   ownername: string;
-  bookingDate: string;
-  returnDate: string;
+  bookingDate: Date;
+  returnDate: Date;
   useremail: string;
   vehicleId: number;
   categoryId: number;
   price: string;
   pickuplocation: string;
   droplocation: string;
-  paymentstatus: Payment;
-  deliverystatus: DeliveryStatus;
+  paymentMethod: PayemntMethod;
 }) {
+  console.log("data to be store:", data);
   const book = await prisma.bookingInfo.create({
     data: {
       username: data.username,
@@ -27,8 +27,7 @@ async function createBooking(data: {
       price: data.price,
       pickuplocation: data.pickuplocation,
       droplocation: data.droplocation,
-      paymentStatus: data.paymentstatus,
-      deliverystatus: data.deliverystatus,
+      paymentMethod: data.paymentMethod,
     },
   });
   return book;
