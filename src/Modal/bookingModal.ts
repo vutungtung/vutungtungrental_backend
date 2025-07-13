@@ -32,5 +32,37 @@ async function createBooking(data: {
   });
   return book;
 }
+async function getAllBookingModal() {
+  const getBooking = await prisma.bookingInfo.findMany({});
+  return getBooking;
+}
+async function getSpecificBookingModal(data: {
+  useremail?: string;
+  username?: string;
+  vehicleId?: number;
+}) {
+  const findBooking = await prisma.bookingInfo.findMany({
+    where: {
+      useremail: data.useremail,
+      username: data.username,
+      vehicleId: data.vehicleId,
+    },
+    select: {
+      vehicle: {
+        select: {
+          name: true,
+          categoryName: true,
+        },
+      },
+      User: {
+        select: {
+          username: true,
+          email: true,
+        },
+      },
+    },
+  });
+  return findBooking;
+}
 
-export { createBooking };
+export { createBooking, getAllBookingModal, getSpecificBookingModal };

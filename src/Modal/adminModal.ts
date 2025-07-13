@@ -55,6 +55,7 @@ async function getAdminByID(adminId: number) {
   });
   return getAdmin;
 }
+
 export {
   createOwner,
   getAllAdmin,

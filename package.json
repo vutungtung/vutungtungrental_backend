@@ -1,7 +1,7 @@
 {
   "scripts": {
     "dev": "tsx --watch src/main.ts",
-    "migrate": "npx prisma migrate dev --name init && npx prisma db push && npx prisma generate",
+    "prisma:migrate": "npx prisma migrate dev --name init && npx prisma db push && npx prisma generate",
     "prisma:reset": "npx prisma migrate reset"
   },
   "dependencies": {
