@@ -10,11 +10,11 @@ import {
   generateAccessToken,
   generateRefreshToken,
   Tokenload,
-} from "../../Middleware/jwtToken";
+} from "../../loginMiddleware/jwtToken";
 import {
   EXPIRE_ACCESS_TOKEN,
   EXPIRE_REFRESH_TOKEN,
-} from "../../Middleware/expireTime";
+} from "../../loginMiddleware/expireTime";
 
 dotenv.config();
 
@@ -30,17 +30,19 @@ const loginUser = async (req: Request, res: Response) => {
     const adminId = Number(admin?.adminId);
 
     if (!user && !admin) {
-      return res.status(401).json({
+      res.status(401).json({
         message: "Incorrect email or password",
       });
+      return;
     }
 
     // Check if already logged in
     const loggedIn = await checkAlreadyLoggedIn(email);
     if (loggedIn) {
-      return res.status(401).json({
+      res.status(401).json({
         message: "Cannot login twice",
       });
+      return;
     }
 
     // Determine if it's an admin or user login
@@ -94,9 +96,10 @@ const loginUser = async (req: Request, res: Response) => {
     return createLogin;
   } catch (err) {
     console.error("Login error:", err);
-    return res.status(500).json({
+    res.status(500).json({
       message: "Unable to login",
     });
+    return;
   }
 };
 

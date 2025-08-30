@@ -1,5 +1,9 @@
 import { Request, Response } from "express";
-import { createOwner, getAllAdmin, getSpecificAdmin } from "../Modal/adminModal";
+import {
+  createOwner,
+  getAllAdmin,
+  getSpecificAdmin,
+} from "../Modal/adminModal";
 import { Role } from "@prisma/client";
 
 const createAdmin = async (
@@ -40,52 +44,50 @@ const createAdmin = async (
     });
   }
 };
-const getAdminController=async(req:Request,res:Response)=>{
-  try{
-    const getData=await getAllAdmin()
-    if(!getData){
+const getAdminController = async (req: Request, res: Response) => {
+  try {
+    const getData = await getAllAdmin();
+    if (!getData) {
       res.status(404).json({
-        message:"No admin found",
-        isSuccess:false
-      })
-      return
+        message: "No admin found",
+        isSuccess: false,
+      });
+      return;
     }
     res.status(200).json({
-      message:"All Admin Listed Below:",
-      data:getData,
-      isSuccess:true
-    })
-    return
-    
-  }catch{
+      message: "All Admin Listed Below:",
+      data: getData,
+      isSuccess: true,
+    });
+    return;
+  } catch {
     res.status(500).json({
-      message:"Server Error:"
-    })
-    return
+      message: "Server Error:",
+    });
+    return;
   }
-}
-const findAdminByEmail=async(req:Request,res:Response)=>{
-  try{
-    const {email,ownername}=req.body
-    const getData=await getSpecificAdmin(email,ownername)
-    if(!getData){
+};
+const findAdminByEmail = async (req: Request, res: Response) => {
+  try {
+    const { email, ownername } = req.body;
+    const getData = await getSpecificAdmin(email, ownername);
+    if (!getData) {
       res.status(400).json({
-        message:"Cannot find the admin",
-        isSuccess:false
-      })
+        message: "Cannot find the admin",
+        isSuccess: false,
+      });
     }
     res.status(200).json({
-      message:"The requested data:",
-      data:getData,
-      isSuccess:false
-    })
-
-  }catch{
+      message: "The requested data:",
+      data: getData,
+      isSuccess: false,
+    });
+  } catch {
     res.status(500).json({
-      message:"Server Error:Unable to get the admin ",
-      isSuccess:false
-    })
+      message: "Server Error:Unable to get the admin ",
+      isSuccess: false,
+    });
   }
-}
+};
 
-export { createAdmin, getAdminController,findAdminByEmail};
+export { createAdmin, getAdminController, findAdminByEmail };

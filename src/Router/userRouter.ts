@@ -1,15 +1,30 @@
-import {Router} from "express";
-import { createUserController, deleteUserController, getAllUserController, updateUserController } from "../Controller/userController";
+import { Router } from "express";
+import {
+  createUserController,
+  deleteUserController,
+  getAllUserController,
+  updateUserController,
+} from "../Controller/userController";
 import { getAllAdmin } from "../Modal/adminModal";
-import { findAdminByEmail, getAdminController } from "../Controller/adminController";
+import {
+  findAdminByEmail,
+  getAdminController,
+} from "../Controller/adminController";
+import {
+  resendOtpController,
+  verifyOtpController,
+} from "../Verify/otpConotroller";
 
-const userRouter=Router()
+const userRouter = Router();
 
-userRouter.post("/",createUserController)
-userRouter.get("/",getAllUserController)
-userRouter.post("/updateuser",updateUserController)
-userRouter.post("/delete",deleteUserController)
-userRouter.get('/admin',getAdminController)
-userRouter.get('/admin/find',findAdminByEmail)
+userRouter.post("/register", createUserController);
+userRouter.post("/verify-otp", verifyOtpController);
+userRouter.post("/send-otp", resendOtpController); //resed the otp
 
-export {userRouter}
+userRouter.get("/", getAllUserController);
+userRouter.post("/updateuser", updateUserController);
+userRouter.post("/delete", deleteUserController);
+userRouter.get("/admin", getAdminController);
+userRouter.get("/admin/find", findAdminByEmail);
+
+export { userRouter };

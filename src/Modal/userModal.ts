@@ -1,22 +1,52 @@
 import { prisma } from "../db";
 import { Role } from "@prisma/client";
-// create user
+import bcrypt from "bcrypt";
 
+// temp user-data
+async function pendingUserModal(data: {
+  username: string;
+  email: string;
+  password: string;
+  role?: Role;
+}) {
+  try {
+    return {
+      username: data.username,
+      email: data.email,
+      password: data.password,
+      role: data.role,
+    };
+  } catch (error) {
+    console.log("pending user error:", error);
+    return null;
+  }
+}
+
+// create user
 async function createUser(data: {
   username: string;
   email: string;
   password: string;
   role?: Role;
 }) {
-  const newUser = await prisma.user.create({
-    data: {
-      username: data.username,
-      email: data.email,
-      password: data.password,
-      role: data.role,
-    },
-  });
-  return newUser;
+  try {
+    // const hashedPassword = await bcrypt.hash(data.password, 10);
+
+    const user = await prisma.user.create({
+      data: {
+        username: data.username,
+        email: data.email,
+        password: data.password,
+        role: data.role,
+        verified: true,
+      },
+    });
+
+    return user;
+  } catch (error) {
+    console.error("Error in userService.createUser:", error);
+    return null;
+  }
 }
 //get user
 
@@ -69,4 +99,5 @@ export {
   updateUserModal,
   deleteUserModal,
   getUserByEmail,
+  pendingUserModal,
 };

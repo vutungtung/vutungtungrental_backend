@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { authenMiddleware } from "../Middleware/authMiddleware";
+import { authenMiddleware } from "../loginMiddleware/authMiddleware";
 import {
   createBookingController,
   getAllBookingDetails,

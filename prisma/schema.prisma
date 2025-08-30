@@ -7,55 +7,70 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Vehicle {
-  v_id         Int           @id @default(autoincrement())
-  name         String
-  description  String
-  imageUrl     String
-  price        Float
-  categoryId   Int
-  categoryName String
-  category     Category      @relation(fields: [categoryId, categoryName], references: [c_id, name])
-  BookingInfo  BookingInfo[]
+// model Vehicle {
+//   vehicleId    Int           @id @default(autoincrement())
+//   vehicleName  String
+//   description  String
+//   image1       String
+//   image2       String
+//   image3       String
+//   price        Float
+//   categoryId   Int
+//   categoryName String
+//   milage       String
+//   vechileType  vechileType
+//   features     String[]
+//   category     Category      @relation(fields: [categoryId, categoryName], references: [c_id, name])
+//   BookingInfo  BookingInfo[]
+// }
+
+enum vechileType {
+  Automatic
+  Manual
 }
 
-model Category {
-  c_id        Int           @id @default(autoincrement())
-  name        String        @unique
-  description String
-  imageUrl    String
-  price       Float
-  vehicles    Vehicle[]
-  Bookings    BookingInfo[]
+// model Category {
+//   c_id        Int           @id @default(autoincrement())
+//   name        String        @unique
+//   description String
+//   imageUrl    String
+//   price       Float
+//   vehicles    Vehicle[]
+//   Bookings    BookingInfo[]
 
-  @@unique([c_id, name])
-  @@map("category")
-}
+//   @@unique([c_id, name])
+//   @@map("category")
+// }
 
 model User {
-  userId      Int           @id @default(autoincrement())
-  username    String        @unique
-  email       String        @unique
-  password    String
-  role        Role          @default(user)
-  createdAt   DateTime      @default(now())
-  updateAt    DateTime      @default(now())
-  Login       Login[]
-  BookingInfo BookingInfo[]
+  userId          Int      @id @default(autoincrement())
+  username        String   @unique
+  email           String   @unique
+  verified        Boolean  @default(false)
+  otpVerify       String?  @default("")
+  otpExpired      BigInt?
+  resetOtp        String?  @default("")
+  resetOtpExpired BigInt?
+  password        String
+  role            Role     @default(user)
+  createdAt       DateTime @default(now())
+  updateAt        DateTime @default(now())
+  Login           Login[]
+  // BookingInfo BookingInfo[]
 
   @@map("user")
 }
 
 model Admin {
-  adminId     Int           @id @default(autoincrement())
-  ownername   String        @unique
-  email       String        @unique
-  passowrd    String
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt()
-  role        Role          @default(admin)
-  Login       Login[]
-  BookingInfo BookingInfo[]
+  adminId   Int      @id @default(autoincrement())
+  ownername String   @unique
+  email     String   @unique
+  passowrd  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt()
+  role      Role     @default(admin)
+  Login     Login[]
+  // BookingInfo BookingInfo[]
 
   @@map("admin")
 }
@@ -80,44 +95,46 @@ model Login {
   @@map("login")
 }
 
-model BookingInfo {
-  bookingId      Int            @id @default(autoincrement())
-  username       String
-  ownername      String
-  bookingDate    DateTime
-  returnDate     DateTime
-  useremail      String
-  vehicleId      Int
-  categoryId     Int
-  price          String
-  pickuplocation String
-  droplocation   String
-  paymentMethod  PayemntMethod  @default(cashOnDelivery)
-  paymentStatus  Payment        @default(pending)
-  deliverystatus DeliveryStatus @default(pending)
-  vehicle        Vehicle        @relation(fields: [vehicleId], references: [v_id])
-  User           User           @relation(fields: [useremail], references: [email])
-  admin          Admin          @relation(fields: [ownername], references: [ownername])
-  category       Category       @relation(fields: [categoryId], references: [c_id])
+// model BookingInfo {
+//   bookingId        Int            @id @default(autoincrement())
+//   username         String
+//   ownername        String
+//   bookingDate      DateTime
+//   returnDate       DateTime
+//   useremail        String
+//   vehicleId        Int
+//   categoryId       Int
+//   price            String
+//   pickuplocation   String
+//   droplocation     String
+//   paymentMethod    PayemntMethod  @default(cashOnDelivery)
+//   paymentStatus    Payment        @default(pending)
+//   deliverystatus   DeliveryStatus @default(pending)
+//   // vehicle        Vehicle        @relation(fields: [vehicleId], references: [v_id])
+//   User             User           @relation(fields: [useremail], references: [email])
+//   admin            Admin          @relation(fields: [ownername], references: [ownername])
+//   category         Category       @relation(fields: [categoryId], references: [c_id])
+//   Vehicle          Vehicle?       @relation(fields: [vehicleVehicleId], references: [vehicleId])
+//   vehicleVehicleId Int?
 
-  @@map("booking")
-}
+//   @@map("booking")
+// }
 
-enum Payment {
-  pending
-  hold
-  completed
-}
+// enum Payment {
+//   pending
+//   hold
+//   completed
+// }
 
-enum DeliveryStatus {
-  pending
-  dilivered
-  cancled
-}
+// enum DeliveryStatus {
+//   pending
+//   dilivered
+//   cancled
+// }
 
-enum PayemntMethod {
-  eSewa
-  khalti
-  fonePay
-  cashOnDelivery
-}
+// enum PayemntMethod {
+//   eSewa
+//   khalti
+//   fonePay
+//   cashOnDelivery
+// }
