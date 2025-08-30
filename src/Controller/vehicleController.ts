@@ -1,140 +1,132 @@
 import { Request, Response } from "express";
 import {
-  CreateVehicle,
-  DeleteVehicle,
-  GetVehicles,
-  UpdateVehicle,
-  GetVehicleByName,
-  GetVehicleByPrice,
-  GetVehicleByCategoryName,
+  createVehicle,
+  getVehicles,
+  getVehicleById,
+  updateVehicle,
+  deleteVehicle,
 } from "../Modal/vehicleModal";
 
-export async function createVehicle_Controller(req: Request, res: Response) {
+export async function createVehicleController(req: Request, res: Response) {
   try {
-    const vehicle = await CreateVehicle(req.body);
-    res.status(201).json(vehicle);
-  } catch (error) {
-    console.error("Error creating vehicle:", error);
-    res.status(500).json({ error: "Failed to create vehicle" });
-  }
-}
+    const files: any = req.files;
 
-export async function getVehicles_Controller(req: Request, res: Response) {
-  try {
-    const vehicles = await GetVehicles();
-    res.status(200).json(vehicles);
-  } catch (error) {
-    res.status(500).json({ error: "Failed to fetch vehicles" });
-  }
-}
+    const image = files?.image?.[0]?.filename ?? req.body.image ?? null;
+    const image1 = files?.image1?.[0]?.filename ?? req.body.image1 ?? null;
+    const image2 = files?.image2?.[0]?.filename ?? req.body.image2 ?? null;
 
-export async function updateVehicle_Controller(req: Request, res: Response) {
-  const { v_id, name, description, imageUrl, price, categoryId, categoryName } =
-    req.body;
-
-  const vehicleId = parseInt(v_id);
-
-  if (isNaN(vehicleId)) {
-    res.status(400).json({ error: "Invalid Vehicle ID" });
-    return;
-  }
-
-  try {
-    const updatedVehicle = await UpdateVehicle(vehicleId, {
+    const {
       name,
+      brand,
+      model,
+      fuelType,
+      licensePlate,
+      vin,
+      mileage,
       description,
-      imageUrl,
-      price,
+      transmission,
+      dailyRate,
       categoryId,
-      categoryName,
+      seatingCapacity,
+    } = req.body;
+
+    if (!name) {
+      res.status(400).json({ error: "Vehicle name is required" });
+      return;
+    }
+    const vehicle = await createVehicle({
+      name,
+      brand,
+      model,
+      fuelType: fuelType as any,
+      licensePlate,
+      vin,
+      mileage: mileage ? Number(mileage) : 0,
+      description,
+      transmission: transmission as any,
+      image,
+      image1,
+      image2,
+      dailyRate: dailyRate ? Number(dailyRate) : 0,
+      categoryId: categoryId ? Number(categoryId) : undefined,
+      seatingCapacity: seatingCapacity ? Number(seatingCapacity) : 0,
     });
 
-    res.status(200).json(updatedVehicle);
-  } catch (error: any) {
-    console.error("Error updating vehicle:", error);
-    res
-      .status(500)
-      .json({ error: error.message || "Failed to update vehicle" });
+    res.status(201).json(vehicle);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      error: "Failed to create vehicle",
+      details: error instanceof Error ? error.message : error,
+    });
   }
 }
 
-export async function deleteVehicle_Controller(req: Request, res: Response) {
-  const v_id = parseInt(req.body.v_id);
-  if (isNaN(v_id)) {
-    res.status(400).json({ error: "Invalid vehicle ID" });
-    return;
-  }
-
+export async function getVehiclesController(req: Request, res: Response) {
   try {
-    const vehicle = await DeleteVehicle(v_id);
+    const vehicles = await getVehicles();
+    res.status(200).json(vehicles);
+  } catch (error) {
+    res.status(500).json({
+      error: "Failed to fetch vehicles",
+      details: error instanceof Error ? error.message : error,
+    });
+  }
+}
+
+export async function getVehicleByIdController(req: Request, res: Response) {
+  try {
+    const id = Number(req.params.id);
+    const vehicle = await getVehicleById(id);
     if (!vehicle) {
       res.status(404).json({ error: "Vehicle not found" });
       return;
     }
     res.status(200).json(vehicle);
   } catch (error) {
-    res.status(500).json({ error: "Failed to delete vehicle" });
+    res.status(500).json({
+      error: "Failed to fetch vehicle",
+      details: error instanceof Error ? error.message : error,
+    });
   }
 }
 
-export async function getVehicleByName_Controller(req: Request, res: Response) {
-  const { name } = req.body;
-  if (!name || typeof name !== "string") {
-    res.status(400).json({ error: "Invalid or missing vehicle name" });
-    return;
-  }
-
+export async function updateVehicleController(req: Request, res: Response) {
   try {
-    const vehicles = await GetVehicleByName(name);
-    if (vehicles.length === 0) {
-      res.status(404).json({ error: "No vehicles found with that name" });
-      return;
-    }
-    res.status(200).json(vehicles);
+    const id = Number(req.params.id);
+    const files: any = req.files;
+
+    // Prioritize uploaded files; fallback to URL from req.body
+    const image = files?.image?.[0]?.filename ?? req.body.image ?? undefined;
+    const image1 = files?.image1?.[0]?.filename ?? req.body.image1 ?? undefined;
+    const image2 = files?.image2?.[0]?.filename ?? req.body.image2 ?? undefined;
+
+    const data = {
+      ...req.body,
+      image,
+      image1,
+      image2,
+    };
+
+    const vehicle = await updateVehicle(id, data);
+    res.status(200).json(vehicle);
   } catch (error) {
-    res.status(500).json({ error: "Failed to fetch vehicles" });
+    console.error(error);
+    res.status(500).json({
+      error: "Failed to update vehicle",
+      details: error instanceof Error ? error.message : error,
+    });
   }
 }
-
-export async function GetVehicleByCategoryName_Controller(
-  req: Request,
-  res: Response
-) {
-  const { categoryName } = req.body;
-  if (!categoryName || typeof categoryName !== "string") {
-    res.status(400).json({ error: "Invalid or missing category name" });
-    return;
-  }
-
+export async function deleteVehicleController(req: Request, res: Response) {
   try {
-    const vehicles = await GetVehicleByCategoryName(categoryName);
-    if (vehicles.length === 0) {
-      res.status(404).json({ error: "No vehicles found for this category" });
-      return;
-    }
-    res.status(200).json(vehicles);
+    const id = Number(req.params.id);
+    await deleteVehicle(id);
+    res.status(200).json({ message: "Vehicle deleted successfully" });
   } catch (error) {
-    res.status(500).json({ error: "Failed to fetch vehicles" });
-  }
-}
-
-export async function GetVehicleByPrice_Controller(
-  req: Request,
-  res: Response
-) {
-  const price = parseFloat(req.body.price);
-  if (isNaN(price)) {
-    res.status(400).json({ error: "Invalid price value" });
-    return;
-  }
-
-  try {
-    const vehicles = await GetVehicleByPrice(price);
-    if (vehicles.length === 0) {
-      res.status(404).json({ error: "No vehicles found at this price" });
-    }
-    res.status(200).json(vehicles);
-  } catch (error) {
-    res.status(500).json({ error: "Failed to fetch vehicles" });
+    res.status(500).json({
+      error: "Failed to delete vehicle",
+      details: error instanceof Error ? error.message : error,
+    });
   }
 }

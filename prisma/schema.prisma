@@ -8,23 +8,82 @@ datasource db {
 }
 
 model Vehicle {
-  v_id         Int      @id @default(autoincrement())
-  name         String
-  description  String
-  imageUrl     String
-  price        Float
-  categoryId   Int
-  categoryName String
-  category     Category @relation(fields: [categoryId, categoryName], references: [c_id, name])
+  v_id            Int                 @id @default(autoincrement())
+  name            String
+  brand           String
+  model           String
+  description     String?
+  licensePlate    String              @unique
+  vin             String?             @unique // optional vehicle identification number
+  mileage         Int? // in kilometers
+  fuelType        VehicleFuelType     @default(PETROL) // Gasoline, Diesel, Electric, Hybrid
+  transmission    VehicleTransmission @default(MANUAL) // Manual, Automatic
+  seatingCapacity Int
+  dailyRate       Decimal             @db.Decimal(10, 2)
+  status          VehicleStatus       @default(AVAILABLE)
+  image           String? // <-- file path for the vehicle image
+  image1          String?
+  image2          String?
+  categoryId      Int
+  category        Category            @relation(fields: [categoryId], references: [c_id])
+
+  rentals Rental[] // relation to rental records
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Category {
-  c_id        Int       @id @default(autoincrement())
-  name        String    @unique
-  description String
-  imageUrl    String
-  price       Float
-  vehicles    Vehicle[]
+  c_id     Int       @id @default(autoincrement())
+  name     String    @unique
+  vehicles Vehicle[]
+}
 
-  @@unique([c_id, name])
+model Rental {
+  r_id           Int          @id @default(autoincrement())
+  startDate      DateTime
+  endDate        DateTime
+  totalPrice     Decimal      @db.Decimal(10, 2)
+  status         RentalStatus @default(PENDING)
+  drivingLicense String?
+  createdAt      DateTime     @default(now())
+  citizenship    String?
+  vehicleId      Int
+  vehicle        Vehicle      @relation(fields: [vehicleId], references: [v_id])
+  userId         Int
+  user           User         @relation(fields: [userId], references: [u_id])
+}
+
+model User {
+  u_id     Int      @id @default(autoincrement())
+  name     String
+  email    String   @unique
+  password String
+  rentals  Rental[]
+}
+
+enum VehicleStatus {
+  AVAILABLE
+  RENTED
+  MAINTENANCE
+  UNAVAILABLE
+}
+
+enum RentalStatus {
+  PENDING
+  ACTIVE
+  COMPLETED
+  CANCELLED
+}
+
+enum VehicleFuelType {
+  PETROL
+  DIESEL
+  ELECTRIC
+  HYBRID
+}
+
+enum VehicleTransmission {
+  MANUAL
+  AUTOMATIC
 }

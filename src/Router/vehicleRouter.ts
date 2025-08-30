@@ -1,22 +1,38 @@
 import { Router } from "express";
+
 import {
-  createVehicle_Controller,
-  getVehicles_Controller,
-  // getVehicleById_Controller,
-  updateVehicle_Controller,
-  deleteVehicle_Controller,
-  getVehicleByName_Controller,
-  GetVehicleByCategoryName_Controller,
-  GetVehicleByPrice_Controller,
+  createVehicleController,
+  getVehiclesController,
+  getVehicleByIdController,
+  updateVehicleController,
+  deleteVehicleController,
 } from "../Controller/vehicleController";
+import upload from "../middleware/multerMiddleware";
 
-const vehicleRouter = Router();
+export const vehicleRouter = Router();
 
-vehicleRouter.post("/create", createVehicle_Controller);
-vehicleRouter.get("/", getVehicles_Controller);
-vehicleRouter.put("/update", updateVehicle_Controller);
-vehicleRouter.delete("/delete", deleteVehicle_Controller);
-vehicleRouter.get("/name", getVehicleByName_Controller);
-vehicleRouter.get("/categoryName", GetVehicleByCategoryName_Controller);
-vehicleRouter.get("/price", GetVehicleByPrice_Controller);
-export { vehicleRouter };
+// Create with multiple image upload
+vehicleRouter.post(
+  "/create",
+  upload.fields([
+    { name: "image", maxCount: 1 },
+    { name: "image1", maxCount: 1 },
+    { name: "image2", maxCount: 1 },
+  ]),
+  createVehicleController
+);
+
+vehicleRouter.get("/", getVehiclesController);
+vehicleRouter.get("/:id", getVehicleByIdController);
+
+vehicleRouter.put(
+  "/update/:id",
+  upload.fields([
+    { name: "image", maxCount: 1 },
+    { name: "image1", maxCount: 1 },
+    { name: "image2", maxCount: 1 },
+  ]),
+  updateVehicleController
+);
+
+vehicleRouter.delete("/delete/:id", deleteVehicleController);

@@ -1,105 +1,146 @@
 import { prisma } from "../db";
+import type {
+  VehicleFuelType,
+  VehicleStatus,
+  VehicleTransmission,
+} from "@prisma/client";
 
-// Create a new Vehicle
-export async function CreateVehicle(data: {
+// CREATE
+export async function createVehicle(data: {
   name: string;
-  price: number;
+  brand?: string;
+  model?: string;
+  fuelType?: VehicleFuelType;
+  licensePlate?: string;
+  vin?: string;
+  mileage?: number;
   description?: string;
-  imageUrl?: string;
-  categoryId: number;
-  categoryName: string;
+  transmission?: VehicleTransmission;
+  image?: string;
+  image1?: string;
+  image2?: string;
+  dailyRate?: number;
+  categoryId?: number;
+  seatingCapacity?: number;
 }) {
-  return await prisma.vehicle.create({
-    data: {
-      name: data.name,
-      price: data.price,
-      description: data.description ?? "",
-      imageUrl: data.imageUrl ?? "",
-      categoryId: data.categoryId,
-      categoryName: data.categoryName,
-    },
+  if (!data.name) throw new Error("Vehicle name is required");
+
+  const vehicleData: any = {
+    name: data.name,
+    brand: data.brand ?? null,
+    model: data.model ?? null,
+    fuelType: data.fuelType ?? "PETROL",
+    licensePlate: data.licensePlate ?? null,
+    vin: data.vin ?? null,
+    mileage: data.mileage ?? 0,
+    description: data.description ?? null,
+    transmission: data.transmission ?? "MANUAL",
+    image: data.image ?? null,
+    image1: data.image1 ?? null,
+    image2: data.image2 ?? null,
+    dailyRate: data.dailyRate ?? 0,
+    seatingCapacity: data.seatingCapacity ?? 0,
+  };
+
+  if (data.categoryId) {
+    const categoryExists = await prisma.category.findUnique({
+      where: { c_id: data.categoryId },
+    });
+    if (!categoryExists) throw new Error("Invalid categoryId");
+    vehicleData.category = { connect: { c_id: data.categoryId } };
+  }
+
+  return prisma.vehicle.create({ data: vehicleData });
+}
+
+// READ
+export async function getVehicles() {
+  return prisma.vehicle.findMany({ include: { category: true } });
+}
+
+export async function getVehicleById(id: number) {
+  return prisma.vehicle.findUnique({
+    where: { v_id: id },
+    include: { category: true },
   });
 }
 
-// Get all Vehicles
-export async function GetVehicles() {
-  const data = await prisma.vehicle.findMany();
-  return data;
-}
-
-
-// Update Vehicle
-export async function UpdateVehicle(
+// UPDATE
+export async function updateVehicle(
   id: number,
   data: {
     name?: string;
-    price?: number;
+    brand?: string;
+    model?: string;
+    fuelType?: VehicleFuelType;
+    licensePlate?: string;
+    vin?: string;
+    mileage?: number;
     description?: string;
-    imageUrl?: string;
+    transmissionType?: VehicleTransmission;
+    image?: string;
+    image1?: string;
+    image2?: string;
+    dailyRate?: number;
     categoryId?: number;
-    categoryName?: string;
+    seatingCapacity?: number;
+    status?: VehicleStatus;
   }
 ) {
-  const updateData: any = {};
-  
-  if (data.name !== undefined) updateData.name = data.name;
-  if (data.price !== undefined) updateData.price = data.price;
-  if (data.description !== undefined) updateData.description = data.description;
-  if (data.imageUrl !== undefined) updateData.imageUrl = data.imageUrl;
-  if (data.categoryId !== undefined) updateData.categoryId = data.categoryId;
-  if (data.categoryName !== undefined) updateData.categoryName = data.categoryName;
+  try {
+    const updateData: any = {};
 
-  const updatedVehicle = await prisma.vehicle.update({
-    where: { v_id: id },
-    data: updateData,
-  });
+    if (data.name) updateData.name = data.name;
+    if (data.brand) updateData.brand = data.brand;
+    if (data.model) updateData.model = data.model;
+    if (data.fuelType) updateData.fuelType = data.fuelType;
+    if (data.licensePlate) updateData.licensePlate = data.licensePlate;
+    if (data.vin) updateData.vin = data.vin;
+    if (data.mileage !== undefined) updateData.mileage = data.mileage;
+    if (data.description) updateData.description = data.description;
+    if (data.transmissionType) updateData.transmission = data.transmissionType;
+    if (data.image !== undefined) updateData.image = data.image;
+    if (data.image1 !== undefined) updateData.image1 = data.image1;
+    if (data.image2 !== undefined) updateData.image2 = data.image2;
+    if (data.dailyRate !== undefined) updateData.dailyRate = data.dailyRate;
+    if (data.seatingCapacity !== undefined)
+      updateData.seatingCapacity = data.seatingCapacity;
+    if (data.status) updateData.status = data.status;
 
-  return updatedVehicle;
+    if (data.licensePlate) {
+      const existingVehicle = await prisma.vehicle.findUnique({
+        where: { licensePlate: data.licensePlate },
+      });
+
+      if (existingVehicle && existingVehicle.v_id !== id) {
+        throw new Error("License plate already exists for another vehicle");
+      }
+
+      updateData.licensePlate = data.licensePlate;
+    }
+
+    // Connect category relation if categoryId is provided
+    if (data.categoryId) {
+      const categoryExists = await prisma.category.findUnique({
+        where: { c_id: data.categoryId },
+      });
+      if (!categoryExists) throw new Error("Invalid categoryId");
+      updateData.category = { connect: { c_id: data.categoryId } };
+    }
+
+    return await prisma.vehicle.update({
+      where: { v_id: id },
+      data: updateData,
+      include: { category: true }, // optional: include category in response
+    });
+  } catch (error) {
+    console.error("Prisma error (updateVehicle):", error);
+    throw new Error(
+      error instanceof Error ? error.message : "Failed to update vehicle"
+    );
+  }
 }
-
-
-// Delete Vehicle
-export async function DeleteVehicle(id: number) {
-  const deletedVehicle = await prisma.vehicle.delete({
-    where: {
-      v_id: id,
-    },
-  });
-  return deletedVehicle;
-}
-
-// Get By Vehicle Name
-export async function GetVehicleByName(name: string) {
-  const data = await prisma.vehicle.findMany({
-    where: {
-      name: {
-        contains: name,
-      },
-    },
-  });
-  return data;
-}
-
-// Get Vehicle by Category Name
-export async function GetVehicleByCategoryName(categoryName: string) {
-  const data = await prisma.vehicle.findMany({
-    where: {
-      categoryName: {
-        contains: categoryName,
-      },
-    },
-  });
-  return data;
-}
-
-// Get Vehicle by Price
-export async function GetVehicleByPrice(price: number) {
-  const data = await prisma.vehicle.findMany({
-    where: {
-      price: {
-        gte: price,
-      },
-    },
-  });
-  return data;
+// DELETE
+export async function deleteVehicle(id: number) {
+  return prisma.vehicle.delete({ where: { v_id: id } });
 }
