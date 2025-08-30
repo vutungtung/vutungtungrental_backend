@@ -23,9 +23,9 @@ import {
 } from "../Modal/adminModal";
 import { createAdmin } from "./adminController";
 import dotenv from "dotenv";
-import transporter from "../Verify/nodeMailer";
+import transporter from "../userRegisterOtpVerify/nodeMailer";
 import { prisma } from "../db";
-import { otpService } from "../Verify/otpService";
+import { otpService } from "../userRegisterOtpVerify/otpService";
 
 dotenv.config();
 

@@ -13,13 +13,13 @@ import {
 import {
   resendOtpController,
   verifyOtpController,
-} from "../Verify/otpConotroller";
+} from "../userRegisterOtpVerify/otpConotroller";
 
 const userRouter = Router();
 
 userRouter.post("/register", createUserController);
 userRouter.post("/verify-otp", verifyOtpController);
-userRouter.post("/send-otp", resendOtpController); //resed the otp
+userRouter.post("/ressend-otp", resendOtpController); //resed the otp
 
 userRouter.get("/", getAllUserController);
 userRouter.post("/updateuser", updateUserController);

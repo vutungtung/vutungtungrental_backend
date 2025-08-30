@@ -43,18 +43,18 @@ enum vechileType {
 // }
 
 model User {
-  userId          Int      @id @default(autoincrement())
-  username        String   @unique
-  email           String   @unique
-  verified        Boolean  @default(false)
-  otpVerify       String?  @default("")
+  userId          Int       @id @default(autoincrement())
+  username        String    @unique
+  email           String    @unique
+  verified        Boolean   @default(false)
+  otpVerify       String?   @default("")
   otpExpired      BigInt?
-  resetOtp        String?  @default("")
-  resetOtpExpired BigInt?
+  resetOtp        String?   @default("")
+  resetOtpExpired DateTime?
   password        String
-  role            Role     @default(user)
-  createdAt       DateTime @default(now())
-  updateAt        DateTime @default(now())
+  role            Role      @default(user)
+  createdAt       DateTime  @default(now())
+  updateAt        DateTime  @default(now())
   Login           Login[]
   // BookingInfo BookingInfo[]
 
@@ -62,14 +62,17 @@ model User {
 }
 
 model Admin {
-  adminId   Int      @id @default(autoincrement())
-  ownername String   @unique
-  email     String   @unique
-  passowrd  String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt()
-  role      Role     @default(admin)
-  Login     Login[]
+  adminId    Int      @id @default(autoincrement())
+  ownername  String   @unique
+  email      String   @unique
+  passowrd   String
+  verified   Boolean  @default(false)
+  otpVerify  String?  @default("")
+  otpExpired BigInt?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt()
+  role       Role     @default(admin)
+  Login      Login[]
   // BookingInfo BookingInfo[]
 
   @@map("admin")

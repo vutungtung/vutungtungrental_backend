@@ -5,15 +5,15 @@ import { prisma } from "../../db";
 // store login details
 
 async function careeteLoginModal(data: {
-  adminId: number |null;
-  userId: number|null;
+  adminId: number | null;
+  userId: number | null;
   refreshToken: string;
   email: string;
   password: string;
   role: Role;
 }) {
-  console.log("data in the model:",data.adminId,data.email)
-    const create= prisma.login.createMany({
+  console.log("data in the model:", data.adminId, data.email);
+  const create = prisma.login.createMany({
     data: {
       userId: data.userId,
       adminId: data.adminId,
@@ -22,9 +22,9 @@ async function careeteLoginModal(data: {
       password: data.password,
       role: data.role,
     },
-   
   });
-  return create ;
+  console.log("data to be stored in the database:", create);
+  return create;
 }
 
 // check already login or not
@@ -63,14 +63,13 @@ async function checkExistingAdmin(email: string, password: string) {
   // console.log(findUser)
   return findAdmin;
 }
-async function checkformRefreshToken(refreshToken:string) {
-  const findemail=await prisma.login.findFirst({
-    where:{
-      refreshToken:refreshToken
-    }
-  })
-  return findemail
-  
+async function checkformRefreshToken(refreshToken: string) {
+  const findemail = await prisma.login.findFirst({
+    where: {
+      refreshToken: refreshToken,
+    },
+  });
+  return findemail;
 }
 
 export {
@@ -78,5 +77,5 @@ export {
   checkAlreadyLoggedIn,
   checkExistingUser,
   checkExistingAdmin,
-  checkformRefreshToken
+  checkformRefreshToken,
 };

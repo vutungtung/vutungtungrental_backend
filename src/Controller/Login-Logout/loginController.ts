@@ -88,12 +88,14 @@ const loginUser = async (req: Request, res: Response) => {
       role,
     });
 
+    console.log("this is create login", createLogin);
     res.status(200).json({
       message: "Logged In",
       role: role,
       data: createLogin,
     });
-    return createLogin;
+    // return createLogin;
+    return;
   } catch (err) {
     console.error("Login error:", err);
     res.status(500).json({
