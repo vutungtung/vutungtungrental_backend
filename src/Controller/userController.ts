@@ -48,7 +48,7 @@ const createUserController = async (req: Request, res: Response) => {
     }
 
     // ✅ Save pending user in session
-    req.session.pendingUser = pendingUserData;
+    req.session.pendingUserData = pendingUserData;
     req.session.email = email;
 
     const otpResult = await otpService.sendOtp(email, req.session);
@@ -71,11 +71,14 @@ const createUserController = async (req: Request, res: Response) => {
 const getAllUserController = async (req: Request, res: Response) => {
   try {
     const getData = await getALlUserMdoal();
+    console.log("get all user data controler:", getData);
     if (!getData) {
       res.status(400).json({ message: "cannot get the data" });
     }
     res.status(200).json(getData);
+    return;
   } catch (err) {
+    console.log("catch block error:", err);
     res.status(500).json({
       message: "No data found",
     });
@@ -132,8 +135,13 @@ const deleteUserController = async (req: Request, res: Response) => {
         message: " Register first to delete User",
       });
     }
+    console.log("user::", findUser);
+    if (password !== findUser?.password) {
+      res.status(400).json({ message: "Password didn't match" });
+    }
     // check user and passeword and delete
-    const deleteUser = await deleteUserModal(email, password);
+    const deleteUser = await deleteUserModal(email);
+    console.log("delet data of user:", deleteUser);
     if (!deleteUser) {
       res.status(404).json({
         message: "Unable to delete the user",
@@ -143,6 +151,7 @@ const deleteUserController = async (req: Request, res: Response) => {
       message: "User deleted",
     });
   } catch (err) {
+    console.log("data delete error:", err);
     res.status(500).json({
       message: "unable to delete the user",
     });

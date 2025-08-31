@@ -12,7 +12,7 @@ export const resetPasswordService = {
     if (!user) throw new Error("User not found");
 
     const otp = generateOtp();
-    const expiry = Date.now() + 10 * 60 * 1000; // 10 minutes (timestamp in ms)
+    const expiry = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes (timestamp in ms)
 
     await prisma.user.update({
       where: { email },

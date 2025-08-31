@@ -52,6 +52,7 @@ async function createUser(data: {
 
 async function getALlUserMdoal() {
   const getusers = await prisma.user.findMany();
+  console.log("get all users datas:", getusers);
   return getusers;
 }
 async function updateUserModal(data: {
@@ -73,11 +74,10 @@ async function updateUserModal(data: {
 
 // delete user
 
-async function deleteUserModal(email: string, password: string) {
+async function deleteUserModal(email: string) {
   const deleteUser = await prisma.user.delete({
     where: {
       email: email,
-      password: password,
     },
   });
   return deleteUser;
