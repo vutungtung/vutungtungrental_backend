@@ -10,7 +10,7 @@ export const verifyOtpController = async (req: Request, res: Response) => {
       res.status(400).json({ success: false, message: "OTP is required" });
       return;
     }
-    if (!req.session.pendingUser) {
+    if (!req.session.pendingUserData) {
       res.status(400).json({ success: false, message: "No pending user data" });
       return;
     }
@@ -21,10 +21,17 @@ export const verifyOtpController = async (req: Request, res: Response) => {
       return;
     }
 
-    const newUser = await createUser(req.session.pendingUser);
+    const newUser = await createUser(req.session.pendingUserData);
+
+    if (!newUser) {
+      res
+        .status(500)
+        .json({ success: false, message: "Failed to create user" });
+      return;
+    }
 
     // Clear session after user created
-    req.session.pendingUser = null;
+    req.session.pendingUserData = null;
     req.session.email = undefined;
 
     await new Promise<void>((resolve, reject) =>
@@ -48,7 +55,7 @@ export const verifyOtpController = async (req: Request, res: Response) => {
 
 export const resendOtpController = async (req: Request, res: Response) => {
   try {
-    if (!req.session.pendingUser) {
+    if (!req.session.pendingUserData) {
       res.status(400).json({ success: false, message: "No pending user data" });
       return;
     }

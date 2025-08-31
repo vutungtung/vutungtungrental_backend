@@ -19,7 +19,7 @@ const userRouter = Router();
 
 userRouter.post("/register", createUserController);
 userRouter.post("/verify-otp", verifyOtpController);
-userRouter.post("/ressend-otp", resendOtpController); //resed the otp
+userRouter.post("/ressend-otp", resendOtpController); //resend the otp
 
 userRouter.get("/", getAllUserController);
 userRouter.post("/updateuser", updateUserController);

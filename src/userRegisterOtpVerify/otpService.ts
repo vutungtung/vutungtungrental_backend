@@ -147,15 +147,15 @@ export const otpService = {
   },
 
   sendOtp: async (email: string, session: any) => {
-    if (!session.pendingUser) {
+    if (!session.pendingUserData) {
       return { success: false, message: "No pending user data" };
     }
 
     const otp = otpService.generateOtp();
     const otpExpiry = Date.now() + 10 * 60 * 1000; // 10 mins
 
-    session.pendingUser.otp = otp;
-    session.pendingUser.otpExpiry = otpExpiry;
+    session.pendingUserData.otp = otp;
+    session.pendingUserData.otpExpiry = otpExpiry;
 
     await new Promise<void>((resolve, reject) => {
       session.save((err: any) => (err ? reject(err) : resolve()));
@@ -165,18 +165,18 @@ export const otpService = {
   },
 
   resendOtp: async (session: any) => {
-    if (!session.pendingUser) {
+    if (!session.pendingUserData) {
       return { success: false, message: "No pending user data" };
     }
-    return otpService.sendOtp(session.pendingUser.email, session);
+    return otpService.sendOtp(session.pendingUserData.email, session);
   },
 
   verifyOtp: async (otp: string, session: any) => {
-    if (!session.pendingUser) {
+    if (!session.pendingUserData) {
       return { success: false, message: "No pending user data" };
     }
 
-    const pendingUser = session.pendingUser;
+    const pendingUser = session.pendingUserData;
 
     if (!pendingUser.otp || !pendingUser.otpExpiry) {
       return { success: false, message: "OTP not generated or expired" };
