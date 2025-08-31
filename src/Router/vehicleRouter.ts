@@ -6,6 +6,13 @@ import {
   getVehicleByIdController,
   updateVehicleController,
   deleteVehicleController,
+  getVehiclesByCategoryNameController,
+  getVehicleByCategoryIdController,
+  getVehicleByPriceRangeController,
+  getVehiclesByNameController,
+  getVehiclesByStatusController,
+  getVehicleByTransmissionController,
+  getVehicleByFuelTypeController,
 } from "../Controller/vehicleController";
 import upload from "../middleware/multerMiddleware";
 
@@ -23,7 +30,25 @@ vehicleRouter.post(
 );
 
 vehicleRouter.get("/", getVehiclesController);
+
+vehicleRouter.get(
+  "/category/:categoryName",
+  getVehiclesByCategoryNameController
+);
+vehicleRouter.get("/category/id/:categoryId", getVehicleByCategoryIdController);
+
+// GET /api/vehicles/by-price-range?gte=1000&lte=5000
+vehicleRouter.get("/by-price-range", getVehicleByPriceRangeController);
+
 vehicleRouter.get("/:id", getVehicleByIdController);
+
+vehicleRouter.get("/status/:status", getVehiclesByStatusController);
+vehicleRouter.get("/name/:name", getVehiclesByNameController);
+vehicleRouter.get(
+  "/transmission/:transmission",
+  getVehicleByTransmissionController
+);
+vehicleRouter.get("/fuel/:fuelType", getVehicleByFuelTypeController); 
 
 vehicleRouter.put(
   "/update/:id",

@@ -17,6 +17,7 @@ app.use("/api/category", categoryRouter);
 // app.use("/uploads", express.static("uploads"));
 
 app.use("/uploads", express.static(path.join(__dirname, "..", "uploads")));
+app.use(express.urlencoded({ extended: true }));
 
 // Simple route to view uploaded images
 // to check if images are uploaded successfully

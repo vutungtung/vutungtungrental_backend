@@ -1,9 +1,12 @@
+import e from "express";
 import { prisma } from "../db";
-import type {
-  VehicleFuelType,
-  VehicleStatus,
-  VehicleTransmission,
+import {
+  Prisma,
+  type VehicleFuelType,
+  type VehicleStatus,
+  type VehicleTransmission,
 } from "@prisma/client";
+import { Decimal } from "@prisma/client/runtime/library";
 
 // CREATE
 export async function createVehicle(data: {
@@ -60,10 +63,15 @@ export async function getVehicles() {
 
 export async function getVehicleById(id: number) {
   return prisma.vehicle.findUnique({
-    where: { v_id: id },
-    include: { category: true },
+    where: {
+      v_id: id,  //  use the function parameter
+    },
+    include: {
+      category: true,
+    },
   });
 }
+
 
 // UPDATE
 export async function updateVehicle(
@@ -144,3 +152,75 @@ export async function updateVehicle(
 export async function deleteVehicle(id: number) {
   return prisma.vehicle.delete({ where: { v_id: id } });
 }
+
+//Get by name
+export async function getVehicleByName(name: string) {
+  return prisma.vehicle.findMany({
+    where: { name },
+    include: { category: true },
+  });
+}
+
+// Get vehicles by price range
+export async function getVehiclesByPriceRange(gte: number, lte: number) {
+  return prisma.vehicle.findMany({
+    where: {
+      dailyRate: {
+        gte: new Decimal(gte),
+        lte: new Decimal(lte),
+      },
+    },
+    orderBy: { dailyRate: "asc" },
+    include: { category: true }, // include related category
+  });
+}
+
+
+
+//get by status
+export async function getVehiclesByStatus(status: VehicleStatus) {
+  return prisma.vehicle.findMany({
+    where: { status },
+    include: { category: true },
+  });
+}
+
+//get by category
+export async function getVehiclesByCategory(categoryId: number) {
+  return prisma.vehicle.findMany({
+    where: { categoryId },
+    include: { category: true },
+  });
+}
+
+//get by category name
+export async function getVehiclesByCategoryName(categoryName: string) {
+  return prisma.vehicle.findMany({
+    where: {
+      category: {
+        name: categoryName,
+      },
+    },
+    include: { category: true },
+  });
+}
+
+
+//get by transmission
+export async function getVehiclesByTransmission(
+  transmission: VehicleTransmission
+) {
+  return prisma.vehicle.findMany({
+    where: { transmission },
+    include: { category: true },
+  });
+}
+
+//get by fuel type
+export async function getVehiclesByFuelType(fuelType: VehicleFuelType) {
+  return prisma.vehicle.findMany({
+    where: { fuelType },
+    include: { category: true }, // only if Vehicle has a relation with Category
+  });
+}
+

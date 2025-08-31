@@ -5,7 +5,20 @@ import {
   getVehicleById,
   updateVehicle,
   deleteVehicle,
+  getVehiclesByCategoryName,
+  getVehiclesByCategory,
+  getVehiclesByPriceRange,
+  getVehiclesByStatus,
+  getVehicleByName,
+  getVehiclesByTransmission,
+  getVehiclesByFuelType,
 } from "../Modal/vehicleModal";
+import {
+  VehicleFuelType,
+  VehicleStatus,
+  VehicleTransmission,
+} from "@prisma/client";
+import { prisma } from "../db";
 
 export async function createVehicleController(req: Request, res: Response) {
   try {
@@ -76,20 +89,32 @@ export async function getVehiclesController(req: Request, res: Response) {
 
 export async function getVehicleByIdController(req: Request, res: Response) {
   try {
-    const id = Number(req.params.id);
-    const vehicle = await getVehicleById(id);
-    if (!vehicle) {
-      res.status(404).json({ error: "Vehicle not found" });
-      return;
+    const id = Number(req.params.id); // Convert to number
+    if (isNaN(id)) {
+       res.status(400).json({ error: "Invalid ID", details: "ID must be a number" });
+       return;
     }
+
+    const vehicle = await prisma.vehicle.findUnique({
+      where: { v_id: id }, // your schema uses v_id
+      include: { category: true },
+    });
+
+    if (!vehicle) {
+       res.status(404).json({ error: "Vehicle not found" });
+       return;
+    }
+
     res.status(200).json(vehicle);
   } catch (error) {
+    console.error(error);
     res.status(500).json({
       error: "Failed to fetch vehicle",
       details: error instanceof Error ? error.message : error,
     });
   }
 }
+
 
 export async function updateVehicleController(req: Request, res: Response) {
   try {
@@ -126,6 +151,152 @@ export async function deleteVehicleController(req: Request, res: Response) {
   } catch (error) {
     res.status(500).json({
       error: "Failed to delete vehicle",
+      details: error instanceof Error ? error.message : error,
+    });
+  }
+}
+
+export async function getVehiclesByCategoryNameController(
+  req: Request,
+  res: Response
+) {
+  try {
+    const categoryName = req.params.categoryName;
+    const vehicles = await getVehiclesByCategoryName(categoryName);
+    res.status(200).json(vehicles);
+  } catch (error) {
+    res.status(500).json({
+      error: "Failed to fetch vehicles by category name",
+      details: error instanceof Error ? error.message : error,
+    });
+  }
+}
+
+export async function getVehicleByCategoryIdController(
+  req: Request,
+  res: Response
+) {
+  try {
+    const categoryId = Number(req.params.categoryId);
+    const vehicles = await getVehiclesByCategory(categoryId);
+    res.status(200).json(vehicles);
+  } catch (error) {
+    res.status(500).json({
+      error: "Failed to fetch vehicles by category ID",
+      details: error instanceof Error ? error.message : error,
+    });
+  }
+}
+
+
+export async function getVehicleByPriceRangeController(req: Request, res: Response) {
+  try {
+    // Convert query params to numbers
+    const gte = req.query.gte ? parseFloat(req.query.gte as string) : 0;
+    const lte = req.query.lte ? parseFloat(req.query.lte as string) : Number.MAX_SAFE_INTEGER;
+
+    // Validate numbers
+    if (isNaN(gte) || isNaN(lte)) {
+       res.status(400).json({ error: "Invalid price range", details: "'gte' and 'lte' must be numbers" });
+       return;
+      }
+    if (gte > lte) {
+       res.status(400).json({ error: "Invalid price range", details: "'gte' must be <= 'lte'" });
+       return;
+    }
+
+    const vehicles = await getVehiclesByPriceRange(gte, lte);
+
+    if (!vehicles.length) {
+       res.status(200).json({ message: "No vehicles found in this price range", data: [] });
+       return;
+    }
+
+    res.status(200).json(vehicles);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      error: "Failed to fetch vehicles by price range",
+      details: error instanceof Error ? error.message : error,
+    });
+  }
+}
+
+
+export async function getVehiclesByStatusController(
+  req: Request,
+  res: Response
+) {
+  try {
+    const status = req.params.status as VehicleStatus;
+    const vehicles = await getVehiclesByStatus(status);
+    res.status(200).json(vehicles);
+  } catch (error) {
+    res.status(500).json({
+      error: "Failed to fetch vehicles by status",
+      details: error instanceof Error ? error.message : error,
+    });
+  }
+}
+
+export async function getVehiclesByNameController(req: Request, res: Response) {
+  try {
+    const name = req.params.name;
+    const vehicles = await getVehicleByName(name);
+    res.status(200).json(vehicles);
+  } catch (error) {
+    res.status(500).json({
+      error: "Failed to fetch vehicles by name",
+      details: error instanceof Error ? error.message : error,
+    });
+  }
+}
+
+export async function getVehicleByTransmissionController(
+  req: Request,
+  res: Response
+) {
+  try {
+    const transmission = req.params.transmission as VehicleTransmission;
+    const vehicles = await getVehiclesByTransmission(transmission);
+    res.status(200).json(vehicles);
+  } catch (error) {
+    res.status(500).json({
+      error: "Failed to fetch vehicles by transmission",
+      details: error instanceof Error ? error.message : error,
+    });
+  }
+}
+
+export async function getVehicleByFuelTypeController(req: Request, res: Response) {
+  try {
+    const fuelType = req.params.fuelType as VehicleFuelType;
+
+    // Optional validation: check if value is allowed
+    const validFuelTypes: VehicleFuelType[] = ["PETROL", "DIESEL", "ELECTRIC", "HYBRID"];
+    if (!validFuelTypes.includes(fuelType)) {
+       res.status(400).json({
+        error: "Invalid fuel type",
+        details: `Allowed values are: ${validFuelTypes.join(", ")}`,
+      });
+      return;
+    }
+
+    const vehicles = await getVehiclesByFuelType(fuelType);
+
+    if (!vehicles || vehicles.length === 0) {
+       res.status(200).json({
+        message: `No vehicles found with fuel type '${fuelType}'`,
+        data: [],
+      });
+      return;
+    }
+
+    res.status(200).json(vehicles);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      error: "Failed to fetch vehicles by fuel type",
       details: error instanceof Error ? error.message : error,
     });
   }
