@@ -53,7 +53,7 @@ model Vehicle {
   categoryId      Int
   category        Category            @relation(fields: [categoryId], references: [c_id])
 
-  rentals Rental[] // relation to rental records
+  // rentals Rental[] // relation to rental records
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -65,20 +65,7 @@ model Category {
   vehicles Vehicle[]
 }
 
-model Rental {
-  r_id           Int          @id @default(autoincrement())
-  startDate      DateTime
-  endDate        DateTime
-  totalPrice     Decimal      @db.Decimal(10, 2)
-  status         RentalStatus @default(PENDING)
-  drivingLicense String?
-  createdAt      DateTime     @default(now())
-  citizenship    String?
-  vehicleId      Int
-  vehicle        Vehicle      @relation(fields: [vehicleId], references: [v_id])
-  userId         Int
-  user           User         @relation(fields: [userId], references: [u_id])
-}
+
 
 
 
@@ -89,12 +76,12 @@ enum VehicleStatus {
   UNAVAILABLE
 }
 
-enum RentalStatus {
-  PENDING
-  ACTIVE
-  COMPLETED
-  CANCELLED
-}
+// enum RentalStatus {
+//   PENDING
+//   ACTIVE
+//   COMPLETED
+//   CANCELLED
+// }
 
 enum VehicleFuelType {
   PETROL
