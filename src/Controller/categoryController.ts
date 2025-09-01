@@ -1,11 +1,3 @@
-<<<<<<< HEAD
-
-import { Request, Response } from "express";
-import { createCategory, deleteCategory, getCategories, getCategoryById, updateCategory } from "../Modal/categoryModal";
-
-
-// Create category
-=======
 import e, { Request, Response } from "express";
 import {
   createCategory,
@@ -16,7 +8,6 @@ import {
   updateCategory,
 } from "../Modal/categoryModal";
 
->>>>>>> 5d8f379d6161abbc3ad88bee2f3f120deffaaf84
 export async function createCategoryController(req: Request, res: Response) {
   try {
     const { name } = req.body;

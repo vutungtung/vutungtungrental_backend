@@ -1,7 +1,3 @@
-<<<<<<< HEAD
-
-=======
->>>>>>> 5d8f379d6161abbc3ad88bee2f3f120deffaaf84
 import { prisma } from "../db";
 
 // Create a category

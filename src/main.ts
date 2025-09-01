@@ -16,10 +16,6 @@ const app = express();
 const PORT = 4000;
 dotenv.config();
 
-<<<<<<< HEAD
-app.use(cookieParser());
-=======
->>>>>>> 5d8f379d6161abbc3ad88bee2f3f120deffaaf84
 app.use(express.json());
 app.use(
   session({

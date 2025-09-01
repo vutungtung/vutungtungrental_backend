@@ -7,32 +7,31 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-
-
 enum vechileType {
   Automatic
   Manual
 }
 
-
 model User {
-  userId          Int       @id @default(autoincrement())
-  username        String    @unique
-  email           String    @unique
-  verified        Boolean   @default(false)
-  otpVerify       String?   @default("")
+  userId          Int           @id @default(autoincrement())
+  username        String        @unique
+  email           String        @unique
+  verified        Boolean       @default(false)
+  otpVerify       String?       @default("")
   otpExpired      DateTime?
-  resetOtp        String?   @default("")
+  resetOtp        String?       @default("")
   resetOtpExpired DateTime?
   password        String
-  role            Role      @default(user)
-  createdAt       DateTime  @default(now())
-  updateAt        DateTime  @default(now())
+  role            Role          @default(user)
+  createdAt       DateTime      @default(now())
+  updateAt        DateTime      @default(now())
   Login           Login[]
   // BookingInfo BookingInfo[]
+  BookingInfo     BookingInfo[]
 
   @@map("user")
 }
+
 model Vehicle {
   v_id            Int                 @id @default(autoincrement())
   name            String
@@ -55,19 +54,17 @@ model Vehicle {
 
   // rentals Rental[] // relation to rental records
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  BookingInfo BookingInfo[]
 }
 
 model Category {
-  c_id     Int       @id @default(autoincrement())
-  name     String    @unique
-  vehicles Vehicle[]
+  c_id        Int           @id @default(autoincrement())
+  name        String        @unique
+  vehicles    Vehicle[]
+  BookingInfo BookingInfo[]
 }
-
-
-
-
 
 enum VehicleStatus {
   AVAILABLE
@@ -75,13 +72,6 @@ enum VehicleStatus {
   MAINTENANCE
   UNAVAILABLE
 }
-
-// enum RentalStatus {
-//   PENDING
-//   ACTIVE
-//   COMPLETED
-//   CANCELLED
-// }
 
 enum VehicleFuelType {
   PETROL
@@ -132,46 +122,43 @@ model Login {
   @@map("login")
 }
 
-// model BookingInfo {
-//   bookingId        Int            @id @default(autoincrement())
-//   username         String
-//   ownername        String
-//   bookingDate      DateTime
-//   returnDate       DateTime
-//   useremail        String
-//   vehicleId        Int
-//   categoryId       Int
-//   price            String
-//   pickuplocation   String
-//   droplocation     String
-//   paymentMethod    PayemntMethod  @default(cashOnDelivery)
-//   paymentStatus    Payment        @default(pending)
-//   deliverystatus   DeliveryStatus @default(pending)
-//   // vehicle        Vehicle        @relation(fields: [vehicleId], references: [v_id])
-//   User             User           @relation(fields: [useremail], references: [email])
-//   admin            Admin          @relation(fields: [ownername], references: [ownername])
-//   category         Category       @relation(fields: [categoryId], references: [c_id])
-//   Vehicle          Vehicle?       @relation(fields: [vehicleVehicleId], references: [vehicleId])
-//   vehicleVehicleId Int?
+model BookingInfo {
+  bookingId      Int            @id @default(autoincrement())
+  bookingDate    DateTime
+  returnDate     DateTime
+  useremail      String
+  vehicleId      Int
+  categoryId     Int
+  price          String
+  pickuplocation String
+  droplocation   String
+  licenseNo      String
+  licenseImg     String?
+  paymentMethod  PayemntMethod  @default(cashOnDelivery)
+  paymentStatus  Payment        @default(pending)
+  deliverystatus DeliveryStatus @default(pending)
+  User           User           @relation(fields: [useremail], references: [email])
+  category       Category?      @relation(fields: [categoryId], references: [c_id])
+  Vehicle        Vehicle?       @relation(fields: [vehicleId], references: [v_id])
 
-//   @@map("booking")
-// }
+  @@map("booking")
+}
 
-// enum Payment {
-//   pending
-//   hold
-//   completed
-// }
+enum Payment {
+  pending
+  hold
+  completed
+}
 
-// enum DeliveryStatus {
-//   pending
-//   dilivered
-//   cancled
-// }
+enum DeliveryStatus {
+  pending
+  dilivered
+  cancled
+}
 
-// enum PayemntMethod {
-//   eSewa
-//   khalti
-//   fonePay
-//   cashOnDelivery
-// }
+enum PayemntMethod {
+  eSewa
+  khalti
+  fonePay
+  cashOnDelivery
+}
