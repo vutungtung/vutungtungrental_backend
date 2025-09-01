@@ -64,14 +64,13 @@ export async function getVehicles() {
 export async function getVehicleById(id: number) {
   return prisma.vehicle.findUnique({
     where: {
-      v_id: id,  //  use the function parameter
+      v_id: id,
     },
     include: {
       category: true,
     },
   });
 }
-
 
 // UPDATE
 export async function updateVehicle(
@@ -126,8 +125,6 @@ export async function updateVehicle(
 
       updateData.licensePlate = data.licensePlate;
     }
-
-    // Connect category relation if categoryId is provided
     if (data.categoryId) {
       const categoryExists = await prisma.category.findUnique({
         where: { c_id: data.categoryId },
@@ -139,7 +136,7 @@ export async function updateVehicle(
     return await prisma.vehicle.update({
       where: { v_id: id },
       data: updateData,
-      include: { category: true }, // optional: include category in response
+      include: { category: true },
     });
   } catch (error) {
     console.error("Prisma error (updateVehicle):", error);
@@ -171,11 +168,9 @@ export async function getVehiclesByPriceRange(gte: number, lte: number) {
       },
     },
     orderBy: { dailyRate: "asc" },
-    include: { category: true }, // include related category
+    include: { category: true },
   });
 }
-
-
 
 //get by status
 export async function getVehiclesByStatus(status: VehicleStatus) {
@@ -205,7 +200,6 @@ export async function getVehiclesByCategoryName(categoryName: string) {
   });
 }
 
-
 //get by transmission
 export async function getVehiclesByTransmission(
   transmission: VehicleTransmission
@@ -220,7 +214,6 @@ export async function getVehiclesByTransmission(
 export async function getVehiclesByFuelType(fuelType: VehicleFuelType) {
   return prisma.vehicle.findMany({
     where: { fuelType },
-    include: { category: true }, // only if Vehicle has a relation with Category
+    include: { category: true },
   });
 }
-

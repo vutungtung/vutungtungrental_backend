@@ -20,10 +20,10 @@ import {
 } from "@prisma/client";
 import { prisma } from "../db";
 
+// Create vehicle
 export async function createVehicleController(req: Request, res: Response) {
   try {
     const files: any = req.files;
-
     const image = files?.image?.[0]?.filename ?? req.body.image ?? null;
     const image1 = files?.image1?.[0]?.filename ?? req.body.image1 ?? null;
     const image2 = files?.image2?.[0]?.filename ?? req.body.image2 ?? null;
@@ -47,6 +47,7 @@ export async function createVehicleController(req: Request, res: Response) {
       res.status(400).json({ error: "Vehicle name is required" });
       return;
     }
+
     const vehicle = await createVehicle({
       name,
       brand,
@@ -75,6 +76,7 @@ export async function createVehicleController(req: Request, res: Response) {
   }
 }
 
+// Get all vehicles
 export async function getVehiclesController(req: Request, res: Response) {
   try {
     const vehicles = await getVehicles();
@@ -87,22 +89,27 @@ export async function getVehiclesController(req: Request, res: Response) {
   }
 }
 
+// Get vehicle by ID
 export async function getVehicleByIdController(req: Request, res: Response) {
   try {
-    const id = Number(req.params.id); // Convert to number
-    if (isNaN(id)) {
-       res.status(400).json({ error: "Invalid ID", details: "ID must be a number" });
-       return;
+    const v_id = Number(req.body.v_id); // ✅ match schema field
+
+    if (isNaN(v_id)) {
+      res.status(400).json({
+        error: "Invalid ID",
+        details: "v_id must be a number",
+      });
+      return;
     }
 
     const vehicle = await prisma.vehicle.findUnique({
-      where: { v_id: id }, // your schema uses v_id
+      where: { v_id },
       include: { category: true },
     });
 
     if (!vehicle) {
-       res.status(404).json({ error: "Vehicle not found" });
-       return;
+      res.status(404).json({ error: "Vehicle not found" });
+      return;
     }
 
     res.status(200).json(vehicle);
@@ -115,25 +122,27 @@ export async function getVehicleByIdController(req: Request, res: Response) {
   }
 }
 
-
+// Update vehicle
 export async function updateVehicleController(req: Request, res: Response) {
   try {
-    const id = Number(req.params.id);
-    const files: any = req.files;
+    const v_id = Number(req.body.v_id);
 
-    // Prioritize uploaded files; fallback to URL from req.body
+    if (isNaN(v_id)) {
+      res.status(400).json({
+        error: "Invalid ID",
+        details: "v_id must be a number",
+      });
+      return;
+    }
+
+    const files: any = req.files;
     const image = files?.image?.[0]?.filename ?? req.body.image ?? undefined;
     const image1 = files?.image1?.[0]?.filename ?? req.body.image1 ?? undefined;
     const image2 = files?.image2?.[0]?.filename ?? req.body.image2 ?? undefined;
 
-    const data = {
-      ...req.body,
-      image,
-      image1,
-      image2,
-    };
+    const data = { ...req.body, image, image1, image2 };
 
-    const vehicle = await updateVehicle(id, data);
+    const vehicle = await updateVehicle(v_id, data);
     res.status(200).json(vehicle);
   } catch (error) {
     console.error(error);
@@ -143,10 +152,21 @@ export async function updateVehicleController(req: Request, res: Response) {
     });
   }
 }
+
+// Delete vehicle
 export async function deleteVehicleController(req: Request, res: Response) {
   try {
-    const id = Number(req.params.id);
-    await deleteVehicle(id);
+    const v_id = Number(req.body.v_id);
+
+    if (isNaN(v_id)) {
+      res.status(400).json({
+        error: "Invalid ID",
+        details: "v_id must be a number",
+      });
+      return;
+    }
+
+    await deleteVehicle(v_id);
     res.status(200).json({ message: "Vehicle deleted successfully" });
   } catch (error) {
     res.status(500).json({
@@ -156,12 +176,13 @@ export async function deleteVehicleController(req: Request, res: Response) {
   }
 }
 
+// Get by category name
 export async function getVehiclesByCategoryNameController(
   req: Request,
   res: Response
 ) {
   try {
-    const categoryName = req.params.categoryName;
+    const { categoryName } = req.body;
     const vehicles = await getVehiclesByCategoryName(categoryName);
     res.status(200).json(vehicles);
   } catch (error) {
@@ -172,12 +193,13 @@ export async function getVehiclesByCategoryNameController(
   }
 }
 
+// Get by category ID
 export async function getVehicleByCategoryIdController(
   req: Request,
   res: Response
 ) {
   try {
-    const categoryId = Number(req.params.categoryId);
+    const categoryId = Number(req.body.categoryId);
     const vehicles = await getVehiclesByCategory(categoryId);
     res.status(200).json(vehicles);
   } catch (error) {
@@ -188,30 +210,39 @@ export async function getVehicleByCategoryIdController(
   }
 }
 
-
-export async function getVehicleByPriceRangeController(req: Request, res: Response) {
+// Get by price range
+export async function getVehicleByPriceRangeController(
+  req: Request,
+  res: Response
+) {
   try {
-    // Convert query params to numbers
-    const gte = req.query.gte ? parseFloat(req.query.gte as string) : 0;
-    const lte = req.query.lte ? parseFloat(req.query.lte as string) : Number.MAX_SAFE_INTEGER;
+    const gte = req.body.gte ? parseFloat(req.body.gte) : 0;
+    const lte = req.body.lte
+      ? parseFloat(req.body.lte)
+      : Number.MAX_SAFE_INTEGER;
 
-    // Validate numbers
     if (isNaN(gte) || isNaN(lte)) {
-       res.status(400).json({ error: "Invalid price range", details: "'gte' and 'lte' must be numbers" });
-       return;
-      }
+      res.status(400).json({
+        error: "Invalid price range",
+        details: "'gte' and 'lte' must be numbers",
+      });
+      return;
+    }
     if (gte > lte) {
-       res.status(400).json({ error: "Invalid price range", details: "'gte' must be <= 'lte'" });
-       return;
+      res.status(400).json({
+        error: "Invalid price range",
+        details: "'gte' must be <= 'lte'",
+      });
+      return;
     }
 
     const vehicles = await getVehiclesByPriceRange(gte, lte);
-
     if (!vehicles.length) {
-       res.status(200).json({ message: "No vehicles found in this price range", data: [] });
-       return;
+      res
+        .status(200)
+        .json({ message: "No vehicles found in this price range", data: [] });
+      return;
     }
-
     res.status(200).json(vehicles);
   } catch (error) {
     console.error(error);
@@ -222,13 +253,13 @@ export async function getVehicleByPriceRangeController(req: Request, res: Respon
   }
 }
 
-
+// Get by status
 export async function getVehiclesByStatusController(
   req: Request,
   res: Response
 ) {
   try {
-    const status = req.params.status as VehicleStatus;
+    const status = req.body.status as VehicleStatus;
     const vehicles = await getVehiclesByStatus(status);
     res.status(200).json(vehicles);
   } catch (error) {
@@ -239,9 +270,10 @@ export async function getVehiclesByStatusController(
   }
 }
 
+// Get by name
 export async function getVehiclesByNameController(req: Request, res: Response) {
   try {
-    const name = req.params.name;
+    const { name } = req.body;
     const vehicles = await getVehicleByName(name);
     res.status(200).json(vehicles);
   } catch (error) {
@@ -252,12 +284,13 @@ export async function getVehiclesByNameController(req: Request, res: Response) {
   }
 }
 
+// Get by transmission
 export async function getVehicleByTransmissionController(
   req: Request,
   res: Response
 ) {
   try {
-    const transmission = req.params.transmission as VehicleTransmission;
+    const transmission = req.body.transmission as VehicleTransmission;
     const vehicles = await getVehiclesByTransmission(transmission);
     res.status(200).json(vehicles);
   } catch (error) {
@@ -268,14 +301,22 @@ export async function getVehicleByTransmissionController(
   }
 }
 
-export async function getVehicleByFuelTypeController(req: Request, res: Response) {
+// Get by fuel type
+export async function getVehicleByFuelTypeController(
+  req: Request,
+  res: Response
+) {
   try {
-    const fuelType = req.params.fuelType as VehicleFuelType;
+    const fuelType = req.body.fuelType as VehicleFuelType;
+    const validFuelTypes: VehicleFuelType[] = [
+      "PETROL",
+      "DIESEL",
+      "ELECTRIC",
+      "HYBRID",
+    ];
 
-    // Optional validation: check if value is allowed
-    const validFuelTypes: VehicleFuelType[] = ["PETROL", "DIESEL", "ELECTRIC", "HYBRID"];
     if (!validFuelTypes.includes(fuelType)) {
-       res.status(400).json({
+      res.status(400).json({
         error: "Invalid fuel type",
         details: `Allowed values are: ${validFuelTypes.join(", ")}`,
       });
@@ -283,15 +324,13 @@ export async function getVehicleByFuelTypeController(req: Request, res: Response
     }
 
     const vehicles = await getVehiclesByFuelType(fuelType);
-
     if (!vehicles || vehicles.length === 0) {
-       res.status(200).json({
+      res.status(200).json({
         message: `No vehicles found with fuel type '${fuelType}'`,
         data: [],
       });
       return;
     }
-
     res.status(200).json(vehicles);
   } catch (error) {
     console.error(error);

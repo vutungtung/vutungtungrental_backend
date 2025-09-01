@@ -1,4 +1,7 @@
+<<<<<<< HEAD
 
+=======
+>>>>>>> 5d8f379d6161abbc3ad88bee2f3f120deffaaf84
 import { prisma } from "../db";
 
 // Create a category
@@ -23,6 +26,11 @@ export async function getCategories() {
 // Get category by id
 export async function getCategoryById(c_id: number) {
   return await prisma.category.findUnique({ where: { c_id } });
+}
+
+//Get category by name
+export async function getCategoryByName(name: string) {
+  return await prisma.category.findUnique({ where: { name } });
 }
 
 // Update category
