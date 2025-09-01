@@ -1,204 +1,124 @@
-// import { Request, Response } from "express";
-// import {
-//   CreateCategory,
-//   DeleteCategory,
-//   GetCategories,
-//   GetCategoryById,
-//   UpdateCategory,
-// } from "../Modal/categotyModal";
-// import { json } from "stream/consumers";
-// import { error } from "console";
+import e, { Request, Response } from "express";
+import {
+  createCategory,
+  deleteCategory,
+  getCategories,
+  getCategoryById,
+  getCategoryByName,
+  updateCategory,
+} from "../Modal/categoryModal";
 
-// export async function CreateCategory_Controller(req: Request, res: Response) {
-//   const { name, description, imageUrl, price } = req.body;
-//   try {
-//     const category = await CreateCategory({
-//       name,
-//       description,
-//       imageUrl,
-//       price,
-//     });
-//     res.status(201).json(category);
-//   } catch (error) {
-//     console.error(error);
-//     res.status(500).json({ error: "Failed to create category" });
-//   }
-// }
-
-// export async function GetCategories_Controller(req: Request, res: Response) {
-//   try {
-//     const categories = await GetCategories();
-//     res.status(200).json(categories);
-//   } catch (error) {
-//     console.error(error);
-//     res.status(500).json({ error: "Failed to fetch categories" });
-//   }
-// }
-
-// export async function GetCategoryById_Controller(req: Request, res: Response) {
-//   const { c_id } = req.body;
-//   const categoryId = parseInt(c_id);
-
-//   if (isNaN(categoryId)) {
-//     res.status(400).json({ error: "Invalid category ID" });
-//     return;
-//   }
-
-//   try {
-//     const category = await GetCategoryById(categoryId);
-//     if (!category) {
-//       res.status(404).json({ error: "Category not found" });
-//       return;
-//     }
-//     res.status(200).json(category);
-//   } catch (error) {
-//     console.error(error);
-//     res.status(500).json({ error: "Failed to fetch category" });
-//   }
-// }
-
-// export async function DeleteCategory_Controller(req: Request, res: Response) {
-//   const { c_id } = req.body;
-//   const categoryId = parseInt(c_id);
-
-//   if (isNaN(categoryId)) {
-//     res.status(400).json({ error: "Invalid category ID" });
-//     return;
-//   }
-
-//   try {
-//     await DeleteCategory(categoryId);
-//     res.status(200).json({ message: "Category deleted successfully" });
-//   } catch (error) {
-//     console.error(error);
-//     res.status(500).json({ error: "Failed to delete category" });
-//   }
-// }
-
-// export async function UpdateCategory_Controller(req: Request, res: Response) {
-//   const { c_id, name, description, imageUrl, price } = req.body;
-//   const categoryId = parseInt(c_id);
-
-//   if (isNaN(categoryId)) {
-//     res.status(400).json({ error: "Invalid category ID" });
-//     return;
-//   }
-
-//   try {
-//     const updatedCategory = await UpdateCategory(categoryId, {
-//       name,
-//       description,
-//       imageUrl,
-//       price,
-//     });
-//     res.status(200).json(updatedCategory);
-//   } catch (error) {
-//     console.error(error);
-//     res.status(500).json({ error: "Failed to update category" });
-//   }
-// }
-
-// export async function GetCategoryByName_Controller(
-//   req: Request,
-//   res: Response
-// ) {
-//   const name = req.body.name;
-//   try {
-//     const categories = await GetCategories();
-//     const filteredCategory = categories.filter(
-//       (categories) =>
-//         categories.name &&
-//         categories.name.toLocaleLowerCase().includes(name.toLowerCase())
-//     );
-//     if (filteredCategory.length === 0) {
-//       res.status(404).json({
-//         error: "No Categories Found",
-//       });
-//       return;
-//     }
-//     res.status(200).json(filteredCategory);
-//   } catch (error) {
-//     res.status(500).json({ error: "Failed to fetch category" });
-//   }
-// }
-
-
-
-import { Request, Response } from "express";
-import { createCategory, deleteCategory, getCategories, getCategoryById, updateCategory } from "../Modal/categoryModal";
-
-
-// Create category
 export async function createCategoryController(req: Request, res: Response) {
-  const { name } = req.body;
   try {
-    const category = await createCategory({
-      name
-    });
+    const { name } = req.body;
+    if (!name) {
+      res.status(400).json({ error: "Category name is required" });
+      return;
+    }
+
+    const category = await createCategory({ name });
     res.status(201).json(category);
-  } catch (error) {
+  } catch (error: any) {
     console.error(error);
-    res.status(500).json({ error: "Failed to create category" });
+    res
+      .status(500)
+      .json({ error: error.message || "Failed to create category" });
   }
 }
 
-// Get all categories
 export async function getCategoriesController(req: Request, res: Response) {
   try {
     const categories = await getCategories();
     res.status(200).json(categories);
-  } catch (error) {
-    console.error("Controller error (getCategories):", error);
-    res.status(500).json({ error: "Failed to get categories" });
+  } catch (error: any) {
+    console.error(error);
+    res
+      .status(500)
+      .json({ error: error.message || "Failed to get categories" });
   }
 }
 
-// Get category by id
 export async function getCategoryByIdController(req: Request, res: Response) {
-  const { c_id } = req.body;
-  const categoryId = parseInt(c_id);
-
-  if (isNaN(categoryId)) {
-    res.status(400).json({ error: "Invalid category ID" });
-    return;
-  }
-
   try {
+    const { c_id } = req.body;
+    const categoryId = Number(c_id);
+    if (isNaN(categoryId)) {
+      res.status(400).json({ error: "Invalid category ID" });
+      return;
+    }
+
     const category = await getCategoryById(categoryId);
     if (!category) {
       res.status(404).json({ error: "Category not found" });
       return;
     }
+
     res.status(200).json(category);
-  } catch (error) {
+  } catch (error: any) {
     console.error(error);
-    res.status(500).json({ error: "Failed to fetch category" });
+    res
+      .status(500)
+      .json({ error: error.message || "Failed to fetch category" });
   }
 }
 
-// Update category
 export async function updateCategoryController(req: Request, res: Response) {
   try {
-    const c_id = Number(req.params.c_id);
-    const { name } = req.body;
+    const { c_id, name } = req.body;
+    const categoryId = Number(c_id);
+    if (isNaN(categoryId)) {
+      res.status(400).json({ error: "Invalid category ID" });
+      return;
+    }
 
-    const category = await updateCategory(c_id, { name });
+    const category = await updateCategory(categoryId, { name });
     res.status(200).json(category);
-  } catch (error) {
-    console.error("Controller error (updateCategory):", error);
-    res.status(500).json({ error: "Failed to update category" });
+  } catch (error: any) {
+    console.error(error);
+    res
+      .status(500)
+      .json({ error: error.message || "Failed to update category" });
   }
 }
 
-// Delete category
 export async function deleteCategoryController(req: Request, res: Response) {
   try {
-    const c_id = Number(req.params.c_id);
-    await deleteCategory(c_id);
+    const { c_id } = req.body;
+    const categoryId = Number(c_id);
+    if (isNaN(categoryId)) {
+      res.status(400).json({ error: "Invalid category ID" });
+      return;
+    }
+
+    await deleteCategory(categoryId);
     res.status(200).json({ message: "Category deleted successfully" });
-  } catch (error) {
-    console.error("Controller error (deleteCategory):", error);
-    res.status(500).json({ error: "Failed to delete category" });
+  } catch (error: any) {
+    console.error(error);
+    res
+      .status(500)
+      .json({ error: error.message || "Failed to delete category" });
   }
 }
 
+export async function getCategoryByNameController(req: Request, res: Response) {
+  try {
+    const { name } = req.body;
+    if (!name) {
+      res.status(400).json({ error: "Category name is required" });
+      return;
+    }
+
+    const category = await getCategoryByName(name);
+    if (!category) {
+      res.status(404).json({ error: "Category not found" });
+      return;
+    }
+
+    res.status(200).json(category);
+  } catch (error: any) {
+    console.error(error);
+    res
+      .status(500)
+      .json({ error: error.message || "Failed to fetch category" });
+  }
+}

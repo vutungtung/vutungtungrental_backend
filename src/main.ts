@@ -9,12 +9,10 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 4000;
 
-// Must have JSON body parser middleware
 app.use(express.json());
 
 app.use("/api/vehicles", vehicleRouter);
 app.use("/api/category", categoryRouter);
-// app.use("/uploads", express.static("uploads"));
 
 app.use("/uploads", express.static(path.join(__dirname, "..", "uploads")));
 app.use(express.urlencoded({ extended: true }));
