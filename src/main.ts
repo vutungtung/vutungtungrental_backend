@@ -16,6 +16,7 @@ const app = express();
 const PORT = 4000;
 dotenv.config();
 
+app.use(cookieParser());
 app.use(express.json());
 app.use(
   session({
@@ -41,6 +42,10 @@ app.use((req, res, next) => {
   next();
 });
 
+app.use(
+  "/uploads",
+  express.static(path.join(__dirname, "../uploads/bookingLicense"))
+);
 app.use("/user", userRouter);
 app.use("/userlogin", loginRouter);
 app.use("/userlogout", logoutRouter);

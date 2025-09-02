@@ -2,13 +2,28 @@ import { Router } from "express";
 import { authenMiddleware } from "../loginMiddleware/authMiddleware";
 import {
   createBookingController,
-  getAllBookingDetails,
-  getSpecificBooking,
+  findAllBookingController,
+  getUserBookingDetailsController,
 } from "../Controller/bookingController";
+import { upload } from "../middleware/bookingMulterMiddleware";
+
 const bookingRouter = Router();
 
-bookingRouter.post("/booking", authenMiddleware, createBookingController);
-bookingRouter.get("/bookingdetails", authenMiddleware, getAllBookingDetails);
-bookingRouter.get("/searchbooking", getSpecificBooking);
+bookingRouter.post(
+  "/booking",
+  authenMiddleware,
+  upload.single("licenseImg"),
+  createBookingController
+);
+bookingRouter.get(
+  "/bookingdetails",
+  authenMiddleware,
+  findAllBookingController
+);
+bookingRouter.get(
+  "/user-booking",
+  authenMiddleware,
+  getUserBookingDetailsController
+);
 
 export { bookingRouter };

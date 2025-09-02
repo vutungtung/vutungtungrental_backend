@@ -92,6 +92,7 @@ const getAllUserController = async (req: Request, res: Response) => {
 const updateUserController = async (req: Request, res: Response) => {
   try {
     const { username, email, password, ownername } = req.body;
+
     const findUser = await getUserByEmail(email);
     const findAdmin = await getSpecificAdmin(email);
     if (findUser) {

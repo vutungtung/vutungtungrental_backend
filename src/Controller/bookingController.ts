@@ -1,130 +1,153 @@
 import { Request, Response } from "express";
-import { checkformRefreshToken } from "../Modal/Login-Logout/loginModal";
-import { getAdminByID } from "../Modal/adminModal";
 import {
   createBooking,
   getAllBookingModal,
-  getSpecificBookingModal,
+  getUserBookingModal,
 } from "../Modal/bookingModal";
+import { checkformRefreshToken } from "../Modal/Login-Logout/loginModal";
 import { getUserByEmail } from "../Modal/userModal";
+import { getVehicleById } from "../Modal/vehicleModal";
+import { getCategoryById } from "../Modal/categoryModal";
 
 const createBookingController = async (req: Request, res: Response) => {
   try {
-    const checkLogin = req.cookies["refresh_token"];
-    console.log("refresh token:", checkLogin);
-    if (!checkLogin) {
-      res.status(401).json({
-        message: "Login first to book vehicle",
-        isSuccess: false,
-      });
-    }
-    const getemail = await checkformRefreshToken(checkLogin);
-    const email = String(getemail?.email);
-    const useremail = String(getemail?.email);
-    console.log("user email:", useremail);
-    const user = await getUserByEmail(email);
-    const username = String(user?.username || "newUser");
-    const getAdminID = Number(getemail?.adminId);
-    const getadmin = await getAdminByID(getAdminID);
-    const ownername = String(getadmin?.ownername || "vutungtung");
     const {
+      licenseNo,
+      vehicleId,
+      bookingDate,
+      returnDate,
+      categoryId,
+      price,
       pickuplocation,
       droplocation,
       paymentMethod,
-      bookingDate,
-      returnDate,
-      vehicleId,
-      categoryId,
-      price,
     } = req.body;
-    console.log("body data:", req.body);
 
-    const booking = await createBooking({
-      username,
-      ownername,
+    const licenseImg = req.file
+      ? `/uploads/bookingLicense/${req.file.filename}`
+      : null;
+    if (licenseImg === null) {
+      res.status(400).json({
+        message: "License required to rent",
+        success: false,
+      });
+      return;
+    }
+    // check if user logged in or not
+    const loginData = await req.cookies["refresh_token"];
+    if (!loginData) {
+      res.status(401).json({
+        message: "Login first to rent the vehicle",
+      });
+      return;
+    }
+    // get the logged in user data from the login table
+    const getUser = await checkformRefreshToken(loginData);
+    const useremail = String(getUser?.email);
+
+    const vechId = Number(vehicleId);
+    const vechName = await getVehicleById(vechId);
+    const vehicleName = String(vechName?.name);
+    const categId = Number(categoryId);
+    const catName = await getCategoryById(categId);
+    const categoryName = String(catName?.name);
+    // getting user name
+    const findUserName = await getUserByEmail(useremail);
+    const username = String(findUserName?.username);
+    const initiate = await createBooking({
+      useremail,
+      licenseImg,
+      licenseNo,
+      vechId,
       bookingDate,
       returnDate,
-      useremail,
-      vehicleId,
-      categoryId,
+      categId,
       price,
       pickuplocation,
       droplocation,
       paymentMethod,
+      username,
+      vehicleName,
+      categoryName,
     });
-
-    if (!booking) {
-      res.status(404).json({
-        message: "Failed to create booking",
-        isSuccess: false,
-      });
-    }
     res.status(200).json({
-      message: "Booking details:",
-      data: booking,
-      isSuccess: true,
+      message: "Rented vehicle Success",
     });
     return;
   } catch (err) {
-    console.log("thia is the error:", err);
+    console.log("Rent the vehicle error:", err);
     res.status(500).json({
-      message: "Server Error:Unable to create the booking",
-      isSuccess: false,
+      message: "Failed to rent the vehicle",
+      success: false,
     });
     return;
   }
 };
-
-const getAllBookingDetails = async (req: Request, res: Response) => {
+// get all booking controller user must be logged in and role must be admin
+const findAllBookingController = async (req: Request, res: Response) => {
   try {
-    const getCookies = req.cookies["refresh_token"];
-    console.log(getCookies);
+    const loginData = req.cookies["refresh_token"];
+    if (!loginData) {
+      res.status(401).json({
+        message: "Login first ",
+      });
+      return;
+    }
+    const getUser = await checkformRefreshToken(loginData);
+    if (getUser?.role !== "admin") {
+      res.status(401).json({
+        message: "You are not admin",
+      });
+      return;
+    }
     const getBooking = await getAllBookingModal();
     if (!getBooking) {
-      res.status(404).json({
-        message: "Unable to fetch booking details",
-        isSuccess: false,
-      });
-    }
-    res.status(200).json({
-      message: "All booking details",
-      data: getBooking,
-      isSuccess: true,
-    });
-  } catch {
-    res.status(500).json({
-      message: "Server Error:Cannot get the booking details ",
-    });
-  }
-};
-const getSpecificBooking = async (req: Request, res: Response) => {
-  try {
-    const { username, useremail, vehicleId } = req.body;
-    const searchBooking = await getSpecificBookingModal({
-      username,
-      useremail,
-      vehicleId,
-    });
-    if (!searchBooking) {
-      res.status(404).json({
-        message: "Cannot get the booking details:",
-        isSuccess: false,
+      res.status(400).json({
+        message: "No booking founds",
       });
       return;
     }
     res.status(200).json({
-      message: " Booking details",
-      data: searchBooking,
-      isSuccess: true,
+      message: "All bookings:",
+      data: getBooking,
     });
     return;
-  } catch {
-    res.status(500).json({
-      message: "Server Error:Cannot get the booking details",
-      isSuccess: false,
+  } catch (err) {
+    console.log("get all bookings error:", err);
+    res.status(404).json({
+      message: "Failed to get the bookings",
     });
     return;
   }
 };
-
-export { createBookingController, getAllBookingDetails, getSpecificBooking };
+// get booking details to specific user
+const getUserBookingDetailsController = async (req: Request, res: Response) => {
+  try {
+    const loginData = await req.cookies["refresh_token"];
+    if (!loginData) {
+      res.status(401).json({
+        message: "Login first ",
+      });
+      return;
+    }
+    const getUser = await checkformRefreshToken(loginData);
+    const email = String(getUser?.email);
+    const getUserBooking = await getUserBookingModal(email);
+    if (!getUserBooking) {
+      res.status(400).json({ message: "No bookings found" });
+    }
+    res.status(200).json({
+      message: "Your Bookings",
+      data: getUserBooking,
+    });
+  } catch (err) {
+    res.status(500).json({
+      message: "Failed to get booking",
+    });
+  }
+};
+export {
+  createBookingController,
+  findAllBookingController,
+  getUserBookingDetailsController,
+};

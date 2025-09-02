@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { otpService } from "./otpService";
 import { createUser } from "../Modal/userModal";
+import { createOwner } from "../Modal/adminModal";
 
 export const verifyOtpController = async (req: Request, res: Response) => {
   try {
@@ -20,6 +21,11 @@ export const verifyOtpController = async (req: Request, res: Response) => {
       res.status(400).json(result);
       return;
     }
+    const data = await req.session.pendingUserData;
+    if (data.role === "admin") {
+      const newAdmin = await createOwner(req.session.pendingUserData);
+    }
+    console.log("data to be store in table", data);
 
     const newUser = await createUser(req.session.pendingUserData);
 

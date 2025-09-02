@@ -126,20 +126,25 @@ model BookingInfo {
   bookingId      Int            @id @default(autoincrement())
   bookingDate    DateTime
   returnDate     DateTime
+  username       String         @default("")
   useremail      String
   vehicleId      Int
+  vehicleName    String?
+  categoryName   String?
   categoryId     Int
-  price          String
+  price          Decimal        @db.Decimal(10, 2)
   pickuplocation String
   droplocation   String
   licenseNo      String
   licenseImg     String?
-  paymentMethod  PayemntMethod  @default(cashOnDelivery)
+  paymentMethod  PaymentMethod  @default(cashOnDelivery)
   paymentStatus  Payment        @default(pending)
   deliverystatus DeliveryStatus @default(pending)
   User           User           @relation(fields: [useremail], references: [email])
   category       Category?      @relation(fields: [categoryId], references: [c_id])
   Vehicle        Vehicle?       @relation(fields: [vehicleId], references: [v_id])
+  createdAt      DateTime       @default(now())
+  updateAt       DateTime       @default(now())
 
   @@map("booking")
 }
@@ -156,7 +161,7 @@ enum DeliveryStatus {
   cancled
 }
 
-enum PayemntMethod {
+enum PaymentMethod {
   eSewa
   khalti
   fonePay
