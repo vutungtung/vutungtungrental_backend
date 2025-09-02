@@ -36,6 +36,14 @@ async function createBooking(data: {
       licenseNo: data.licenseNo,
     },
   });
+  const updateVehiclStatus = await prisma.vehicle.update({
+    where: {
+      v_id: data.vechId,
+    },
+    data: {
+      status: "RENTED",
+    },
+  });
   return book;
 }
 async function getAllBookingModal() {
@@ -95,4 +103,27 @@ async function getUserBookingModal(email: string) {
     console.log("User booking details error:", err);
   }
 }
-export { createBooking, getAllBookingModal, getUserBookingModal };
+async function cancelBookingModal(vid: number, email: string) {
+  const cancel = await prisma.bookingInfo.deleteMany({
+    where: {
+      vehicleId: vid,
+      useremail: email,
+    },
+  });
+  const updateVehicleStatus = await prisma.vehicle.update({
+    where: {
+      v_id: vid,
+    },
+    data: {
+      status: "AVAILABLE",
+    },
+  });
+  return;
+}
+
+export {
+  createBooking,
+  getAllBookingModal,
+  getUserBookingModal,
+  cancelBookingModal,
+};
