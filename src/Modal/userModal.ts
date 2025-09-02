@@ -1,40 +1,68 @@
 import { prisma } from "../db";
 import { Role } from "@prisma/client";
-// create user
+import bcrypt from "bcrypt";
 
+// temp user-data
+async function pendingUserModal(data: {
+  username: string;
+  email: string;
+  password: string;
+  role?: Role;
+}) {
+  try {
+    return {
+      username: data.username,
+      email: data.email,
+      password: data.password,
+      role: data.role,
+    };
+  } catch (error) {
+    console.log("pending user error:", error);
+    return null;
+  }
+}
+
+// create user
 async function createUser(data: {
   username: string;
   email: string;
   password: string;
-  role?:Role;
+  role?: Role;
 }) {
-  const newUser = await prisma.user.create({
-    data: {
-      username: data.username,
-      email: data.email,
-      password: data.password,
-      role:data.role
-    },
-  });
-  return newUser;
+  try {
+    // const hashedPassword = await bcrypt.hash(data.password, 10);
+
+    const user = await prisma.user.create({
+      data: {
+        username: data.username,
+        email: data.email,
+        password: data.password,
+        role: data.role,
+        verified: true,
+      },
+    });
+
+    return user;
+  } catch (error) {
+    console.error("Error in userService.createUser:", error);
+    return null;
+  }
 }
 //get user
 
 async function getALlUserMdoal() {
   const getusers = await prisma.user.findMany();
+  console.log("get all users datas:", getusers);
   return getusers;
 }
-async function updateUserModal(
-
-  data: {
-    email?: string;
-    username?: string;
-    password?: string;
-  }
-) {
+async function updateUserModal(data: {
+  email?: string;
+  username?: string;
+  password?: string;
+}) {
   const update = await prisma.user.updateMany({
     where: {
-      email:data.email
+      email: data.email,
     },
     data: {
       username: data.username,
@@ -46,11 +74,10 @@ async function updateUserModal(
 
 // delete user
 
-async function deleteUserModal(email: string, password: string) {
+async function deleteUserModal(email: string) {
   const deleteUser = await prisma.user.delete({
     where: {
       email: email,
-      password: password,
     },
   });
   return deleteUser;
@@ -65,9 +92,6 @@ async function getUserByEmail(email: string) {
   return findUser;
 }
 
-
-
-
 // exprt function
 export {
   createUser,
@@ -75,4 +99,5 @@ export {
   updateUserModal,
   deleteUserModal,
   getUserByEmail,
+  pendingUserModal,
 };

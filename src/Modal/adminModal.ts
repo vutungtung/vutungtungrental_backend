@@ -29,20 +29,37 @@ async function getSpecificAdmin(email?: string, ownername?: string) {
   });
   return findAdmin;
 }
-async function updateAdmin(ownername?: string, email?: string,
-  passowrd?:string,
-  role?:Role
+async function updateAdmin(
+  ownername?: string,
+  email?: string,
+  passowrd?: string,
+  role?: Role
 ) {
   const update = await prisma.admin.update({
     where: {
       email: email,
     },
     data: {
-      ownername:ownername,
-      passowrd:passowrd,
-      role:role
+      ownername: ownername,
+      passowrd: passowrd,
+      role: role,
     },
   });
-  return update
+  return update;
 }
-export { createOwner, getAllAdmin, getSpecificAdmin,updateAdmin };
+async function getAdminByID(adminId: number) {
+  const getAdmin = await prisma.admin.findUnique({
+    where: {
+      adminId: adminId,
+    },
+  });
+  return getAdmin;
+}
+
+export {
+  createOwner,
+  getAllAdmin,
+  getSpecificAdmin,
+  updateAdmin,
+  getAdminByID,
+};

@@ -4,50 +4,81 @@ import {
   deleteUserModal,
   getALlUserMdoal,
   getUserByEmail,
+  pendingUserModal,
   updateUserModal,
 } from "../Modal/userModal";
 import { Request, Response } from "express";
-import { createOwner, getSpecificAdmin, updateAdmin } from "../Modal/adminModal";
-import { createAdmin } from "./adminController";
 
-// new user creation controller
+// Extend express-session types to include 'email' and 'pendingUserData' in SessionData
+declare module "express-session" {
+  interface SessionData {
+    email?: string;
+    pendingUserData?: any;
+  }
+}
+import {
+  createOwner,
+  getSpecificAdmin,
+  updateAdmin,
+} from "../Modal/adminModal";
+import { createAdmin } from "./adminController";
+import dotenv from "dotenv";
+import transporter from "../userRegisterOtpVerify/nodeMailer";
+import { prisma } from "../db";
+import { otpService } from "../userRegisterOtpVerify/otpService";
+
+dotenv.config();
+
 const createUserController = async (req: Request, res: Response) => {
   try {
     const { username, email, password, role } = req.body;
-    if (role === "admin") {
-      console.log("this is entered rolle in userCOnyroller",role)
-      const registerasAdmin = await createAdmin( username,email,password, res);
-      return registerasAdmin;
-      
-    }
-    const register = await createUser({ username, email, password, role });
-    if (!register) {
-      res.status(404).json({
-        message: "Unable to create check user input",
-      });
-    }
-    res.status(200).json({
-      data: register,
-      message: "Register Successfuly",
+
+    const pendingUserData = await pendingUserModal({
+      username,
+      email,
+      password,
+      role,
     });
-  } catch (err) {
-    console.error("Error creating user:", err);
-    res.status(500).json({
-      message: "Server error while creating user",
+
+    if (!pendingUserData) {
+      res
+        .status(500)
+        .json({ success: false, message: "Pending user creation failed" });
+      return;
+    }
+
+    // ✅ Save pending user in session
+    req.session.pendingUserData = pendingUserData;
+    req.session.email = email;
+
+    const otpResult = await otpService.sendOtp(email, req.session);
+    if (!otpResult.success) {
+      res.status(500).json({ success: false, message: otpResult.message });
+      return;
+    }
+
+    res.status(201).json({
+      success: true,
+      message: "OTP sent to your email. Please verify to create your account.",
     });
+  } catch (error) {
+    console.error("Error in createUserController:", error);
+    res.status(500).json({ success: false, message: "Server error" });
   }
-  return;
 };
 
 // get all user
 const getAllUserController = async (req: Request, res: Response) => {
   try {
     const getData = await getALlUserMdoal();
+    console.log("get all user data controler:", getData);
     if (!getData) {
       res.status(400).json({ message: "cannot get the data" });
     }
     res.status(200).json(getData);
+    return;
   } catch (err) {
+    console.log("catch block error:", err);
     res.status(500).json({
       message: "No data found",
     });
@@ -60,31 +91,31 @@ const getAllUserController = async (req: Request, res: Response) => {
 
 const updateUserController = async (req: Request, res: Response) => {
   try {
-    const { username, email, password,ownername } = req.body;
-    const findUser=await getUserByEmail(email)
-    const findAdmin=await getSpecificAdmin(email)
-    if(findUser){
-     const update = await updateUserModal({ username, email, password });
-    console.log(update);
-    res.status(200).json({
-      message:"User Updated:",
-      data:update,
-      isSuccess:true
-    });
-    }else if(findAdmin){
-      const update=await updateAdmin(ownername,email,password)
+    const { username, email, password, ownername } = req.body;
+
+    const findUser = await getUserByEmail(email);
+    const findAdmin = await getSpecificAdmin(email);
+    if (findUser) {
+      const update = await updateUserModal({ username, email, password });
+      console.log(update);
       res.status(200).json({
-        message:"Admin Updated",
-        data:update,
-        isSuccess:true
-      })
-      return
+        message: "User Updated:",
+        data: update,
+        isSuccess: true,
+      });
+    } else if (findAdmin) {
+      const update = await updateAdmin(ownername, email, password);
+      res.status(200).json({
+        message: "Admin Updated",
+        data: update,
+        isSuccess: true,
+      });
+      return;
     }
     res.status(400).json({
-      message:"Unable to update ",
-      isSuccess:false
-    })
-   
+      message: "Unable to update ",
+      isSuccess: false,
+    });
   } catch (err) {
     console.log(err);
     res.status(500).json({
@@ -105,8 +136,13 @@ const deleteUserController = async (req: Request, res: Response) => {
         message: " Register first to delete User",
       });
     }
+    console.log("user::", findUser);
+    if (password !== findUser?.password) {
+      res.status(400).json({ message: "Password didn't match" });
+    }
     // check user and passeword and delete
-    const deleteUser = await deleteUserModal(email, password);
+    const deleteUser = await deleteUserModal(email);
+    console.log("delet data of user:", deleteUser);
     if (!deleteUser) {
       res.status(404).json({
         message: "Unable to delete the user",
@@ -116,6 +152,7 @@ const deleteUserController = async (req: Request, res: Response) => {
       message: "User deleted",
     });
   } catch (err) {
+    console.log("data delete error:", err);
     res.status(500).json({
       message: "unable to delete the user",
     });
