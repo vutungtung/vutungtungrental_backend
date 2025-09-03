@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import {
+  cancelBookingModal,
   createBooking,
   getAllBookingModal,
   getUserBookingModal,
@@ -78,140 +79,140 @@ const createBookingController = async (req: Request, res: Response) => {
       useremail,
       "booking details",
       `<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rent Confirmation</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            line-height: 1.6;
-            color: #333333;
-            max-width: 600px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-        .header {
-            text-align: center;
-            padding: 10px 0;
-            border-bottom: 3px solid #4a90e2;
-        }
-        .logo {
-            font-size: 24px;
-            font-weight: bold;
-            color: #4a90e2;
-        }
-        .content {
-            padding: 20px;
-            background-color: #f9f9f9;
-            border-radius: 5px;
-            margin-top: 20px;
-        }
-        .details-container {
-            background-color: #ffffff;
-            border-radius: 5px;
-            padding: 20px;
-            margin: 20px 0;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
-        .detail-row {
-            display: flex;
-            justify-content: space-between;
-            padding: 8px 0;
-            border-bottom: 1px solid #eeeeee;
-        }
-        .detail-label {
-            font-weight: bold;
-            color: #555555;
-        }
-        .detail-value {
-            text-align: right;
-        }
-        .price {
-            font-size: 24px;
-            font-weight: bold;
-            color: #4a90e2;
-            text-align: center;
-            margin: 20px 0;
-        }
-        .footer {
-            text-align: center;
-            padding: 20px;
-            font-size: 12px;
-            color: #999999;
-        }
-        .button {
-            display: block;
-            width: 200px;
-            margin: 20px auto;
-            padding: 12px;
-            background-color: #4a90e2;
-            color: white;
-            text-align: center;
-            text-decoration: none;
-            border-radius: 5px;
-            font-weight: bold;
-        }
-        .icon {
-            width: 20px;
-            height: 20px;
-            margin-right: 10px;
-            vertical-align: middle;
-        }
-    </style>
-</head>
-<body>
-    <div class="header">
-        <div class="logo">VutungTung</div>
-    </div>
-    
-    <div class="content">
-        <h2>Your Rental is Confirmed!</h2>
-        <p>Dear ${username},</p>
-        <p>Thank you for choosing our vutungtung. Your booking has been confirmed. Below are the details of your reservation:</p>
-        
-        <div class="details-container">
-            <div class="detail-row">
-                <span class="detail-label">Vehicle:</span>
-                <span class="detail-value">${vehicleName}</span>
-            </div>
-            <div class="detail-row">
-                <span class="detail-label">Booking Date:</span>
-                <span class="detail-value">${bookingDate}</span>
-            </div>
-            <div class="detail-row">
-                <span class="detail-label">Return Date:</span>
-                <span class="detail-value">${returnDate}</span>
-            </div>
-            <div class="detail-row">
-                <span class="detail-label">Pick-up Location:</span>
-                <span class="detail-value">${pickuplocation}</span>
-            </div>
-            <div class="detail-row">
-                <span class="detail-label">Drop-off Location:</span>
-                <span class="detail-value">${droplocation}</span>
-            </div>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Rent Confirmation</title>
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                line-height: 1.6;
+                color: #333333;
+                max-width: 600px;
+                margin: 0 auto;
+                padding: 20px;
+            }
+            .header {
+                text-align: center;
+                padding: 10px 0;
+                border-bottom: 3px solid #4a90e2;
+            }
+            .logo {
+                font-size: 24px;
+                font-weight: bold;
+                color: #4a90e2;
+            }
+            .content {
+                padding: 20px;
+                background-color: #f9f9f9;
+                border-radius: 5px;
+                margin-top: 20px;
+            }
+            .details-container {
+                background-color: #ffffff;
+                border-radius: 5px;
+                padding: 20px;
+                margin: 20px 0;
+                box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            }
+            .detail-row {
+                display: flex;
+                justify-content: space-between;
+                padding: 8px 0;
+                border-bottom: 1px solid #eeeeee;
+            }
+            .detail-label {
+                font-weight: bold;
+                color: #555555;
+            }
+            .detail-value {
+                text-align: right;
+            }
+            .price {
+                font-size: 24px;
+                font-weight: bold;
+                color: #4a90e2;
+                text-align: center;
+                margin: 20px 0;
+            }
+            .footer {
+                text-align: center;
+                padding: 20px;
+                font-size: 12px;
+                color: #999999;
+            }
+            .button {
+                display: block;
+                width: 200px;
+                margin: 20px auto;
+                padding: 12px;
+                background-color: #4a90e2;
+                color: white;
+                text-align: center;
+                text-decoration: none;
+                border-radius: 5px;
+                font-weight: bold;
+            }
+            .icon {
+                width: 20px;
+                height: 20px;
+                margin-right: 10px;
+                vertical-align: middle;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="header">
+            <div class="logo">VutungTung</div>
         </div>
-        
-        <div class="price">Total: ${price}</div>
-        
-        <a href="#" class="button">View Booking Details</a>
-        
-        <p>Please bring your driver's license, proof of insurance, and a credit card in your name when you pick up the vehicle.</p>
-        <p>If you have any questions or need to modify your reservation, please contact us at support@vutungtung .</p>
-        
-        <p>We look forward to serving you!</p>
-        <p>The VutungTung Team</p>
-    </div>
-    
-    <div class="footer">
-        <p>© 2023 VutungTung. All rights reserved.</p>
-        <p>Butwal-3,Goalpark,Nepal</p>
-        <p>You're receiving this email because you made a booking with VutungTung.</p>
-    </div>
-</body>
-</html>`
+
+        <div class="content">
+            <h2>Your Rental is Confirmed!</h2>
+            <p>Dear ${username},</p>
+            <p>Thank you for choosing our vutungtung. Your booking has been confirmed. Below are the details of your reservation:</p>
+
+            <div class="details-container">
+                <div class="detail-row">
+                    <span class="detail-label">Vehicle:</span>
+                    <span class="detail-value">${vehicleName}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Booking Date:</span>
+                    <span class="detail-value">${bookingDate}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Return Date:</span>
+                    <span class="detail-value">${returnDate}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Pick-up Location:</span>
+                    <span class="detail-value">${pickuplocation}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Drop-off Location:</span>
+                    <span class="detail-value">${droplocation}</span>
+                </div>
+            </div>
+
+            <div class="price">Total: ${price}</div>
+
+            <a href="#" class="button">View Booking Details</a>
+
+            <p>Please bring your driver's license, proof of insurance, and a credit card in your name when you pick up the vehicle.</p>
+            <p>If you have any questions or need to modify your reservation, please contact us at support@vutungtung .</p>
+
+            <p>We look forward to serving you!</p>
+            <p>The VutungTung Team</p>
+        </div>
+
+        <div class="footer">
+            <p>© 2023 VutungTung. All rights reserved.</p>
+            <p>Butwal-3,Goalpark,Nepal</p>
+            <p>You're receiving this email because you made a booking with VutungTung.</p>
+        </div>
+    </body>
+    </html>`
     );
     return;
   } catch (err) {
@@ -286,8 +287,46 @@ const getUserBookingDetailsController = async (req: Request, res: Response) => {
     });
   }
 };
+const cancelBookingController = async (req: Request, res: Response) => {
+  try {
+    // check login
+    const loginData = req.cookies["refresh_token"];
+    if (!loginData) {
+      res.status(401).json({
+        message: "Login first to cancel booking",
+      });
+      return;
+    }
+
+    // verify user
+    const getUser = await checkformRefreshToken(loginData);
+    const useremail = String(getUser?.email);
+
+    // get vehicleId from body
+    const { vehicleId } = req.body;
+    if (!vehicleId) {
+      res.status(400).json({ message: "Vehicle ID is required" });
+      return;
+    }
+
+    const v_id = Number(vehicleId);
+
+    // call modal
+    const cancelResult = await cancelBookingModal(v_id, useremail);
+
+    res.status(200).json({
+      message: "Booking cancelled successfully",
+    });
+    return;
+  } catch (error) {
+    console.error("catch error cancel booking:", error);
+    res.status(500).json({ message: "Failed to cancel booking" });
+    return;
+  }
+};
 export {
   createBookingController,
   findAllBookingController,
   getUserBookingDetailsController,
+  cancelBookingController,
 };

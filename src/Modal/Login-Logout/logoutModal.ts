@@ -1,5 +1,4 @@
-import { PrismaClient } from "../../generated/prisma";
-const prisma = new PrismaClient();
+import { prisma } from "../../db";
 
 async function logoutUserModal(email: string, password: string) {
   const logout = await prisma.login.deleteMany({

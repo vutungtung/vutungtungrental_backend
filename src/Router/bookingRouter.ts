@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { authenMiddleware } from "../loginMiddleware/authMiddleware";
 import {
+  cancelBookingController,
   createBookingController,
   findAllBookingController,
   getUserBookingDetailsController,
@@ -25,5 +26,9 @@ bookingRouter.get(
   authenMiddleware,
   getUserBookingDetailsController
 );
-
+bookingRouter.post(
+  "/cancel-booking",
+  authenMiddleware,
+  cancelBookingController
+);
 export { bookingRouter };
