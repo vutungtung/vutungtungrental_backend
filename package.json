@@ -1,6 +1,7 @@
 {
   "scripts": {
     "dev": "tsx --watch src/main.ts",
+    "production": "npm run build && npm run start",
     "build": "tsc",
     "start": "node dist/main.js",
     "prisma:migrate": "npx prisma migrate dev --name init && npx prisma db push && npx prisma generate",
