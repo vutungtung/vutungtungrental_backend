@@ -103,16 +103,19 @@ async function getUserBookingModal(email: string) {
     console.log("User booking details error:", err);
   }
 }
-async function cancelBookingModal(vid: number, email: string) {
-  const cancel = await prisma.bookingInfo.deleteMany({
+// cancel booking
+async function cancelBookingModal(bookingID: number, vehicleId: number) {
+  const cancel = await prisma.bookingInfo.update({
     where: {
-      vehicleId: vid,
-      useremail: email,
+      bookingId: bookingID,
+    },
+    data: {
+      deliverystatus: "cancled",
     },
   });
   const updateVehicleStatus = await prisma.vehicle.update({
     where: {
-      v_id: vid,
+      v_id: vehicleId,
     },
     data: {
       status: "AVAILABLE",
@@ -120,10 +123,46 @@ async function cancelBookingModal(vid: number, email: string) {
   });
   return;
 }
-
+// getBooking details by booking id
+async function getBookingDetailByIdModal(bookingId: number) {
+  const bookingDetailById = await prisma.bookingInfo.findUnique({
+    where: {
+      bookingId: bookingId,
+    },
+    select: {
+      bookingDate: true,
+      username: true,
+      vehicleId: true,
+      vehicleName: true,
+      categoryName: true,
+      price: true,
+      pickuplocation: true,
+      droplocation: true,
+      licenseNo: true,
+      paymentMethod: true,
+      paymentStatus: true,
+      deliverystatus: true,
+    },
+  });
+  return bookingDetailById;
+}
+async function getVehicleForBooking(vehicleId: number) {
+  const data = await prisma.vehicle.findUnique({
+    where: {
+      v_id: vehicleId,
+    },
+    select: {
+      name: true,
+      status: true,
+    },
+  });
+  return data;
+}
 export {
   createBooking,
   getAllBookingModal,
   getUserBookingModal,
   cancelBookingModal,
+  getBookingDetailByIdModal,
+  getVehicleForBooking,
 };

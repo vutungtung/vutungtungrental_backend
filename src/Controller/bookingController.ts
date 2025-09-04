@@ -3,7 +3,9 @@ import {
   cancelBookingModal,
   createBooking,
   getAllBookingModal,
+  getBookingDetailByIdModal,
   getUserBookingModal,
+  getVehicleForBooking,
 } from "../Modal/bookingModal";
 import { checkformRefreshToken } from "../Modal/Login-Logout/loginModal";
 import { getUserByEmail } from "../Modal/userModal";
@@ -13,12 +15,11 @@ import { sendMail } from "../userRegisterOtpVerify/nodeMailer";
 
 const createBookingController = async (req: Request, res: Response) => {
   try {
+    const { categoryId, vehicleId } = req.params;
     const {
       licenseNo,
-      vehicleId,
       bookingDate,
       returnDate,
-      categoryId,
       price,
       pickuplocation,
       droplocation,
@@ -48,8 +49,14 @@ const createBookingController = async (req: Request, res: Response) => {
     const useremail = String(getUser?.email);
 
     const vechId = Number(vehicleId);
-    const vechName = await getVehicleById(vechId);
-    const vehicleName = String(vechName?.name);
+    const vech = await getVehicleForBooking(vechId);
+    if (vech?.status !== "AVAILABLE") {
+      res.status(400).json({
+        message: "Not available for booking ",
+      });
+    }
+    const vehicleName = String(vech?.name);
+    console.log("This is the vehicle name ", vehicleName);
     const categId = Number(categoryId);
     const catName = await getCategoryById(categId);
     const categoryName = String(catName?.name);
@@ -77,7 +84,7 @@ const createBookingController = async (req: Request, res: Response) => {
     });
     await sendMail(
       useremail,
-      "booking details",
+      "Renting details",
       `<!DOCTYPE html>
     <html lang="en">
     <head>
@@ -287,6 +294,30 @@ const getUserBookingDetailsController = async (req: Request, res: Response) => {
     });
   }
 };
+
+const getBookingDetailsById = async (req: Request, res: Response) => {
+  try {
+    const { bookingId } = req.params;
+    const bookId = Number(bookingId);
+    const getBookingDetail = await getBookingDetailByIdModal(bookId);
+    if (!getBookingDetail) {
+      res.status(400).json({
+        message: "No booking details found",
+      });
+    }
+    res.status(200).json({
+      message: "Booking details:",
+      data: getBookingDetail,
+    });
+  } catch (err) {
+    console.log("getBooking details by booking id error:", err);
+    res.status(500).json({
+      message: "Failed to View the details",
+      data: err,
+    });
+  }
+};
+
 const cancelBookingController = async (req: Request, res: Response) => {
   try {
     // check login
@@ -302,21 +333,256 @@ const cancelBookingController = async (req: Request, res: Response) => {
     const getUser = await checkformRefreshToken(loginData);
     const useremail = String(getUser?.email);
 
-    // get vehicleId from body
-    const { vehicleId } = req.body;
-    if (!vehicleId) {
-      res.status(400).json({ message: "Vehicle ID is required" });
+    // get vehicleId from link
+    const { bookingId } = req.params;
+    if (!bookingId) {
+      res.status(400).json({ message: "Booking id is required" });
       return;
     }
 
-    const v_id = Number(vehicleId);
+    const bookingID = Number(bookingId);
 
+    const getBookingDetailsById = await getBookingDetailByIdModal(bookingID);
+    const vehicleId = Number(getBookingDetailsById?.vehicleId);
     // call modal
-    const cancelResult = await cancelBookingModal(v_id, useremail);
+    const cancelResult = await cancelBookingModal(bookingID, vehicleId);
 
     res.status(200).json({
       message: "Booking cancelled successfully",
     });
+    await sendMail(
+      useremail,
+      "Booking Cancellation",
+      `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Booking Cancellation Confirmation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .email-container {
+            max-width: 650px;
+            width: 100%;
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .email-header {
+            background: linear-gradient(135deg, #2c3e50, #4a6580);
+            color: white;
+            padding: 30px 20px;
+            text-align: center;
+        }
+        
+        .email-body {
+            padding: 35px;
+        }
+        
+        .email-footer {
+            background: #f1f5f9;
+            padding: 25px;
+            text-align: center;
+            font-size: 14px;
+            color: #64748b;
+        }
+        
+        h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        
+        h2 {
+            font-size: 20px;
+            color: #2c3e50;
+            margin-bottom: 20px;
+        }
+        
+        p {
+            line-height: 1.6;
+            color: #475569;
+            margin-bottom: 15px;
+        }
+        
+        .booking-details {
+            background: #f8fafc;
+            border-left: 4px solid #3b82f6;
+            padding: 20px;
+            margin: 25px 0;
+            border-radius: 4px;
+        }
+        
+        .detail-row {
+            display: flex;
+            margin-bottom: 10px;
+        }
+        
+        .detail-label {
+            font-weight: 600;
+            color: #334155;
+            width: 140px;
+        }
+        
+        .detail-value {
+            color: #475569;
+            flex: 1;
+        }
+        
+        .refund-info {
+            background: #f0f9ff;
+            border: 1px solid #bae6fd;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 25px 0;
+        }
+        
+        .button {
+            display: inline-block;
+            background: #3b82f6;
+            color: white;
+            text-decoration: none;
+            padding: 14px 30px;
+            border-radius: 6px;
+            font-weight: 600;
+            margin: 15px 5px;
+        }
+        
+        .button.outline {
+            background: transparent;
+            border: 1px solid #3b82f6;
+            color: #3b82f6;
+        }
+        
+        .text-center {
+            text-align: center;
+        }
+        
+        .divider {
+            height: 1px;
+            background: #e2e8f0;
+            margin: 30px 0;
+        }
+        
+        .contact-info {
+            text-align: center;
+            margin-top: 25px;
+        }
+        
+        .logo {
+            font-size: 26px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+        }
+        
+        .cancellation-icon {
+            font-size: 60px;
+            color: #ef4444;
+            margin-bottom: 20px;
+        }
+        
+        @media (max-width: 650px) {
+            .email-body {
+                padding: 25px;
+            }
+            
+            .detail-row {
+                flex-direction: column;
+                margin-bottom: 12px;
+            }
+            
+            .detail-label {
+                width: 100%;
+                margin-bottom: 5px;
+            }
+            
+            .button {
+                display: block;
+                margin: 10px 0;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <div class="email-header">
+            <div class="logo">VutunTung Rental</div>
+            <h1>Booking Cancellation Confirmation</h1>
+        </div>
+        
+        <div class="email-body">
+            <div class="text-center">
+                <div class="cancellation-icon">✖</div>
+            </div>
+            
+            <h2>Dear ${getBookingDetailsById?.username} ,</h2>
+            
+            <p>We have processed your request and your booking has been successfully cancelled.</p>
+            
+            <div class="booking-details">
+                <h3>Cancellation Details:</h3>
+              
+                <div class="detail-row">
+                    <span class="detail-label">Vehicle:${
+                      getBookingDetailsById?.vehicleName
+                    }</span>
+             
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Booked for:</span>
+                    <span class="detail-value">${
+                      getBookingDetailsById?.bookingDate
+                    }</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Cancellation Date:</span>
+                    <span class="detail-value">${new Date()}</span>
+                </div>
+            </div>
+            
+            <div class="refund-info">
+                <h3>Refund Information</h3>
+                <p>Based on our cancellation policy, a refund of <strong>${
+                  getBookingDetailsById?.price
+                }</strong> will be processed to your original payment method.</p>
+                <p>Please allow 7-10 business days for the refund to appear in your account.</p>
+            </div>
+            
+            <p>We're sorry to see you go. If there was anything we could have done to improve your experience, we'd appreciate your feedback.</p>
+            
+            <div class="contact-info">
+                <p>If you have any questions or need further assistance, please contact our support team:</p>
+                <p>Email: <a href="mailto:support@vutungtung.com">support@vutungtung.com</a></p>
+            </div>
+        </div>
+        
+        <div class="email-footer">
+           <p>© 2023 VutungTung. All rights reserved.</p>
+             <p>Butwal-3,Goalpark,Nepal</p>
+            <p><a href="#">Privacy Policy</a> | <a href="#">Terms of Service</a> | <a href="#">Cancellation Policy</a></p>
+        </div>
+    </div>
+</body>
+</html>`
+    );
     return;
   } catch (error) {
     console.error("catch error cancel booking:", error);
@@ -329,4 +595,5 @@ export {
   findAllBookingController,
   getUserBookingDetailsController,
   cancelBookingController,
+  getBookingDetailsById,
 };
