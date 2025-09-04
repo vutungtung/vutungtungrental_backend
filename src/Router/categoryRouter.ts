@@ -1,18 +1,20 @@
 import { Router } from "express";
 import {
   createCategoryController,
-  getCategoriesController,
   getCategoryByIdController,
-  getCategoryByNameController,
   updateCategoryController,
   deleteCategoryController,
+  getCategoryByNameController,
+  getAllCategoryController,
 } from "../Controller/categoryController";
 
 export const categoryRouter = Router();
 
 categoryRouter.post("/create", createCategoryController);
-categoryRouter.post("/all", getCategoriesController);
-categoryRouter.post("/by-id", getCategoryByIdController);
-categoryRouter.post("/by-name", getCategoryByNameController);
-categoryRouter.post("/update", updateCategoryController);
-categoryRouter.post("/delete", deleteCategoryController);
+categoryRouter.get("/all", getAllCategoryController);
+categoryRouter.get("/id/:c_id", getCategoryByIdController);
+categoryRouter.put("/update/:c_id", updateCategoryController);
+categoryRouter.delete("/delete/:c_id", deleteCategoryController);
+categoryRouter.get("/by-name/:name", getCategoryByNameController);
+
+

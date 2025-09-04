@@ -28,9 +28,9 @@ vehicleRouter.post(
 );
 
 vehicleRouter.get("/", getVehiclesController);
-vehicleRouter.post("/by-id", getVehicleByIdController);
+vehicleRouter.get("/id/:v_id", getVehicleByIdController);
 vehicleRouter.put(
-  "/update",
+  "/update/:v_id",
   upload.fields([
     { name: "image", maxCount: 1 },
     { name: "image1", maxCount: 1 },
@@ -38,11 +38,18 @@ vehicleRouter.put(
   ]),
   updateVehicleController
 );
-vehicleRouter.delete("/delete", deleteVehicleController);
-vehicleRouter.post("/by-category-name", getVehiclesByCategoryNameController);
-vehicleRouter.post("/by-category-id", getVehicleByCategoryIdController);
-vehicleRouter.post("/by-price-range", getVehicleByPriceRangeController);
-vehicleRouter.post("/by-status", getVehiclesByStatusController);
-vehicleRouter.post("/by-name", getVehiclesByNameController);
-vehicleRouter.post("/by-transmission", getVehicleByTransmissionController);
-vehicleRouter.post("/by-fuel", getVehicleByFuelTypeController);
+vehicleRouter.delete("/delete/:v_id", deleteVehicleController);
+
+vehicleRouter.get(
+  "/category/name/:categoryName",
+  getVehiclesByCategoryNameController
+);
+vehicleRouter.get("/category/:categoryId", getVehicleByCategoryIdController);
+vehicleRouter.get("/price/:gte/:lte", getVehicleByPriceRangeController);
+vehicleRouter.get("/status/:status", getVehiclesByStatusController);
+vehicleRouter.get("/name/:name", getVehiclesByNameController);
+vehicleRouter.get(
+  "/transmission/:transmission",
+  getVehicleByTransmissionController
+);
+vehicleRouter.get("/fuel/:fuelType", getVehicleByFuelTypeController);
