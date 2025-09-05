@@ -24,9 +24,8 @@ const loginUser = async (req: Request, res: Response) => {
     const { email, password } = req.body;
 
     if (!email || !password) {
-      return res
-        .status(400)
-        .json({ message: "Email and password are required" });
+      res.status(400).json({ message: "Email and password are required" });
+      return;
     }
 
     // Check both user and admin tables
@@ -36,24 +35,28 @@ const loginUser = async (req: Request, res: Response) => {
     ]);
 
     if (!user && !admin) {
-      return res.status(401).json({ message: "Incorrect email or password" });
+      res.status(401).json({ message: "Incorrect email or password" });
+      return;
     }
 
     // Determine account and password
     const account = user ?? admin;
     if (!account.password) {
-      return res.status(500).json({ message: "No password found for account" });
+      res.status(500).json({ message: "No password found for account" });
+      return;
     }
 
     const isValid = await comparePassword(password, account.password);
     if (!isValid) {
-      return res.status(400).json({ message: "Password did not match" });
+      res.status(400).json({ message: "Password did not match" });
+      return;
     }
 
     // Check if already logged in
     const loggedIn = await checkAlreadyLoggedIn(email);
     if (loggedIn) {
-      return res.status(401).json({ message: "Cannot login twice" });
+      res.status(401).json({ message: "Cannot login twice" });
+      return;
     }
 
     // Determine if it's an admin or user login
@@ -97,14 +100,16 @@ const loginUser = async (req: Request, res: Response) => {
       role,
     });
 
-    return res.status(200).json({
+    res.status(200).json({
       message: "Logged In",
       role,
       data: createLogin,
     });
+    return;
   } catch (err) {
     console.error("Login error:", err);
-    return res.status(500).json({ message: "Unable to login" });
+    res.status(500).json({ message: "Unable to login" });
+    return;
   }
 };
 

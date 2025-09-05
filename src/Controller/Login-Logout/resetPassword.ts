@@ -38,13 +38,15 @@ export const resetPasswordController = {
 
       // Check if passwords match
       if (newPassword !== confirmPassword) {
-        return res.status(400).json({
+        res.status(400).json({
           message: "New Password and Confirm Password didn't match",
         });
+        return;
       }
 
       if (!req.session) {
-        return res.status(400).json({ message: "Session not found" });
+        res.status(400).json({ message: "Session not found" });
+        return;
       }
       const hashedPassword = await hashPassword(newPassword);
       console.log("this is hashed passowrd:", hashedPassword);
@@ -54,9 +56,11 @@ export const resetPasswordController = {
         req.session
       );
 
-      return res.status(200).json(result);
+      res.status(200).json(result);
+      return;
     } catch (err: any) {
-      return res.status(400).json({ error: err.message });
+      res.status(400).json({ error: err.message });
+      return;
     }
   },
 };
