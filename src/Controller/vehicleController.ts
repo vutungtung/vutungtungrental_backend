@@ -19,6 +19,7 @@ import {
   VehicleTransmission,
 } from "@prisma/client";
 import { prisma } from "../db";
+import { checkformRefreshToken } from "../Modal/Login-Logout/loginModal";
 
 export async function createVehicleController(req: Request, res: Response) {
   try {
@@ -40,7 +41,14 @@ export async function createVehicleController(req: Request, res: Response) {
       categoryId,
       seatingCapacity,
     } = req.body;
-
+const login=req.cookies['refresh_token']
+const logInfo=await checkformRefreshToken(login)
+if(logInfo?.role!=="admin"){
+  res.status(400).json({
+    message:"Admin only can create vehicles"
+  })
+  return;
+}
     if (!name) {
       res.status(400).json({ error: "Vehicle name is required" });
       return;
@@ -122,6 +130,14 @@ export async function getVehicleByIdController(req: Request, res: Response) {
 export async function updateVehicleController(req: Request, res: Response) {
   try {
     const v_id = Number(req.params.v_id);
+    const login=req.cookies['refresh_token']
+const logInfo=await checkformRefreshToken(login)
+if(logInfo?.role!=="admin"){
+  res.status(400).json({
+    message:"Admin only can update vehicles"
+  })
+  return;
+}
     if (isNaN(v_id)) {
       res
         .status(400)
@@ -149,6 +165,15 @@ export async function updateVehicleController(req: Request, res: Response) {
 export async function deleteVehicleController(req: Request, res: Response) {
   try {
     const v_id = Number(req.params.v_id);
+    const login=req.cookies['refresh_token']
+    const logInfo = await checkformRefreshToken(login);
+    if(logInfo?.role !== "admin"){
+      res.status(400).json({
+        message : "Admin only can Delete vehicles"
+      })
+      return;
+    }
+    
     if (isNaN(v_id)) {
       res
         .status(400)
