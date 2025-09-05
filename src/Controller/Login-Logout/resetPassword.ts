@@ -1,5 +1,6 @@
 import { resetPasswordService } from "../../Modal/Login-Logout/resetPasswordModal";
 import { Request, Response } from "express";
+import { hashPassword } from "../../Utils/passwordHashing";
 
 export const resetPasswordController = {
   async sendOtp(req: Request, res: Response) {
@@ -33,20 +34,29 @@ export const resetPasswordController = {
 
   async resetPassword(req: Request, res: Response) {
     try {
-      const { newPassword, confirmPassord } = req.body;
-      if (newPassword !== confirmPassord) {
-        res
-          .status(400)
-          .json({ message: "New Passowrd and Confirm password didn't match" });
+      const { newPassword, confirmPassword } = req.body;
+
+      // Check if passwords match
+      if (newPassword !== confirmPassword) {
+        return res.status(400).json({
+          message: "New Password and Confirm Password didn't match",
+        });
       }
+
+      if (!req.session) {
+        return res.status(400).json({ message: "Session not found" });
+      }
+      const hashedPassword = await hashPassword(newPassword);
+      console.log("this is hashed passowrd:", hashedPassword);
+      // Call the reset password service
       const result = await resetPasswordService.resetPassword(
-        newPassword,
+        hashedPassword,
         req.session
       );
-      res.json(result);
-      return;
+
+      return res.status(200).json(result);
     } catch (err: any) {
-      res.status(400).json({ error: err.message });
+      return res.status(400).json({ error: err.message });
     }
   },
 };
