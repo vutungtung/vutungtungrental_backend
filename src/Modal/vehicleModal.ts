@@ -26,6 +26,7 @@ export async function createVehicle(data: {
   categoryId?: number;
   seatingCapacity?: number;
 }) {
+  
   if (!data.name) throw new Error("Vehicle name is required");
 
   const vehicleData: any = {

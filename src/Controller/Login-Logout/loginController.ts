@@ -15,6 +15,7 @@ import {
   EXPIRE_ACCESS_TOKEN,
   EXPIRE_REFRESH_TOKEN,
 } from "../../loginMiddleware/expireTime";
+import { comparePassword } from "../../Utils/passwordHashing";
 
 dotenv.config();
 
@@ -22,26 +23,39 @@ const loginUser = async (req: Request, res: Response) => {
   try {
     const { email, password } = req.body;
 
+    if (!email || !password) {
+      res.status(400).json({ message: "Email and password are required" });
+      return;
+    }
+
     // Check both user and admin tables
     const [user, admin] = await Promise.all([
-      checkExistingUser(email, password),
-      checkExistingAdmin(email, password),
+      checkExistingUser(email),
+      checkExistingAdmin(email),
     ]);
-    const adminId = Number(admin?.adminId);
 
     if (!user && !admin) {
-      res.status(401).json({
-        message: "Incorrect email or password",
-      });
+      res.status(401).json({ message: "Incorrect email or password" });
+      return;
+    }
+
+    // Determine account and password
+    const account = user ?? admin;
+    if (!account.password) {
+      res.status(500).json({ message: "No password found for account" });
+      return;
+    }
+
+    const isValid = await comparePassword(password, account.password);
+    if (!isValid) {
+      res.status(400).json({ message: "Password did not match" });
       return;
     }
 
     // Check if already logged in
     const loggedIn = await checkAlreadyLoggedIn(email);
     if (loggedIn) {
-      res.status(401).json({
-        message: "Cannot login twice",
-      });
+      res.status(401).json({ message: "Cannot login twice" });
       return;
     }
 
@@ -52,16 +66,15 @@ const loginUser = async (req: Request, res: Response) => {
 
     // Create token payload
     const userPayload: Tokenload = {
-      userId: userId ?? "",
-      role: role,
+      userId,
+      role,
     };
 
     // Generate tokens
     const refreshToken = generateRefreshToken(userPayload);
-    const access_token = generateAccessToken(userPayload);
+    const accessToken = generateAccessToken(userPayload);
 
     // Set cookies
-    console.log("this is the refresh token", refreshToken);
     res.cookie("refresh_token", refreshToken, {
       path: "/",
       sameSite: "lax",
@@ -69,8 +82,7 @@ const loginUser = async (req: Request, res: Response) => {
       httpOnly: true,
       expires: new Date(Date.now() + EXPIRE_REFRESH_TOKEN * 1000),
     });
-    console.log("This is the access token", access_token);
-    res.cookie("access_token", access_token, {
+    res.cookie("access_token", accessToken, {
       path: "/",
       secure: true,
       sameSite: "lax",
@@ -83,24 +95,20 @@ const loginUser = async (req: Request, res: Response) => {
       userId: user?.userId ?? null,
       adminId: admin?.adminId ?? null,
       email,
-      password,
+      password: account.password,
       refreshToken,
       role,
     });
 
-    console.log("this is create login", createLogin);
     res.status(200).json({
       message: "Logged In",
-      role: role,
+      role,
       data: createLogin,
     });
-    // return createLogin;
     return;
   } catch (err) {
     console.error("Login error:", err);
-    res.status(500).json({
-      message: "Unable to login",
-    });
+    res.status(500).json({ message: "Unable to login" });
     return;
   }
 };

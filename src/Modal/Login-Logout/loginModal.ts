@@ -1,6 +1,7 @@
 // import { PrismaClient } from "./generated/prisma";
 import { Role } from "@prisma/client";
 import { prisma } from "../../db";
+import { promises } from "dns";
 
 // store login details
 
@@ -38,25 +39,30 @@ async function checkAlreadyLoggedIn(email: string) {
   return findUser;
 }
 // check user register already or not
-async function checkExistingUser(email: string, password: string) {
+async function checkExistingUser(email: string) {
   const findUser = await prisma.user.findFirst({
     where: {
       email: email,
-      password: password,
+    },
+    select: {
+      password: true,
+      userId: true,
+      email: true,
     },
   });
 
   console.log(findUser);
   return findUser;
 }
-async function checkExistingAdmin(email: string, password: string) {
+async function checkExistingAdmin(email: string): Promise<any> {
   const findAdmin = await prisma.admin.findFirst({
     where: {
       email: email,
-      passowrd: password,
     },
     select: {
       adminId: true,
+      passowrd: true,
+      email: true,
     },
   });
 

@@ -26,17 +26,19 @@ import dotenv from "dotenv";
 import transporter from "../userRegisterOtpVerify/nodeMailer";
 import { prisma } from "../db";
 import { otpService } from "../userRegisterOtpVerify/otpService";
+import { hashPassword } from "../Utils/passwordHashing";
 
 dotenv.config();
 
 const createUserController = async (req: Request, res: Response) => {
   try {
     const { username, email, password, role } = req.body;
+    const hashedPassword = await hashPassword(password);
 
     const pendingUserData = await pendingUserModal({
       username,
       email,
-      password,
+      password: hashedPassword,
       role,
     });
 
