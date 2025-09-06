@@ -4,6 +4,7 @@ import {
   deleteUserModal,
   getALlUserMdoal,
   getUserByEmail,
+  getUserByUsername,
   pendingUserModal,
   updateUserModal,
 } from "../Modal/userModal";
@@ -26,13 +27,22 @@ import dotenv from "dotenv";
 import transporter from "../userRegisterOtpVerify/nodeMailer";
 import { prisma } from "../db";
 import { otpService } from "../userRegisterOtpVerify/otpService";
-import { hashPassword } from "../Utils/passwordHashing";
+import { comparePassword, hashPassword } from "../Utils/passwordHashing";
+import { checkRefreshToken } from "../Modal/Login-Logout/logoutModal";
 
 dotenv.config();
 
 const createUserController = async (req: Request, res: Response) => {
   try {
     const { username, email, password, role } = req.body;
+    const userNameExist = await getUserByUsername(username);
+    if (userNameExist) {
+      res.status(400).json({
+        message: "Username Already exist",
+        isSuccess: false,
+      });
+      return;
+    }
     const hashedPassword = await hashPassword(password);
 
     const pendingUserData = await pendingUserModal({
@@ -49,7 +59,6 @@ const createUserController = async (req: Request, res: Response) => {
       return;
     }
 
-    // ✅ Save pending user in session
     req.session.pendingUserData = pendingUserData;
     req.session.email = email;
 
@@ -60,12 +69,14 @@ const createUserController = async (req: Request, res: Response) => {
     }
 
     res.status(201).json({
-      success: true,
+      isSuccess: true,
       message: "OTP sent to your email. Please verify to create your account.",
     });
+    return;
   } catch (error) {
     console.error("Error in createUserController:", error);
     res.status(500).json({ success: false, message: "Server error" });
+    return;
   }
 };
 
@@ -93,20 +104,22 @@ const getAllUserController = async (req: Request, res: Response) => {
 
 const updateUserController = async (req: Request, res: Response) => {
   try {
-    const { username, email, password, ownername } = req.body;
+    const login = req.cookies["refresh_token"];
+    const data = await checkRefreshToken(login);
+    const email = String(data?.email);
+    const password = String(data?.password);
+    const { name } = req.body;
 
-    const findUser = await getUserByEmail(email);
-    const findAdmin = await getSpecificAdmin(email);
-    if (findUser) {
-      const update = await updateUserModal({ username, email, password });
+    if (data?.role === "user") {
+      const update = await updateUserModal({ email, password, name });
       console.log(update);
       res.status(200).json({
         message: "User Updated:",
         data: update,
         isSuccess: true,
       });
-    } else if (findAdmin) {
-      const update = await updateAdmin(ownername, email, password);
+    } else if (data?.role === "admin") {
+      const update = await updateAdmin(email, password, name);
       res.status(200).json({
         message: "Admin Updated",
         data: update,
@@ -130,18 +143,29 @@ const updateUserController = async (req: Request, res: Response) => {
 
 const deleteUserController = async (req: Request, res: Response) => {
   try {
-    const { email, password } = req.body;
+    const login = req.cookies["refresh_token"];
+    const data = await checkRefreshToken(login);
+    if (!data) {
+      res.status(400).json({
+        message: "Token Missing:Failed to delete the user",
+      });
+    }
+    const email = String(data?.email);
+    const { password } = req.body;
     // finding the email in user table
     const findUser = await getUserByEmail(email);
     if (!findUser) {
       res.status(404).json({
-        message: " Register first to delete User",
+        message: "No user found",
       });
     }
-    console.log("user::", findUser);
-    if (password !== findUser?.password) {
-      res.status(400).json({ message: "Password didn't match" });
+    const isValid = await comparePassword(password, String(findUser?.password));
+    if (!isValid) {
+      res.status(400).json({
+        message: "Passoword didn't match",
+      });
     }
+
     // check user and passeword and delete
     const deleteUser = await deleteUserModal(email);
     console.log("delet data of user:", deleteUser);

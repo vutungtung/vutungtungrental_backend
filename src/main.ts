@@ -20,7 +20,7 @@ app.use(cookieParser());
 app.use(express.json());
 app.use(
   session({
-    secret: process.env.JWT_SECRET || "somesecret",
+    secret: process.env.JWT_SECRET || "JWT_SECERETE_TOKEN#",
     resave: false,
     saveUninitialized: true,
     cookie: { maxAge: 15 * 60 * 1000 }, // 15 min
