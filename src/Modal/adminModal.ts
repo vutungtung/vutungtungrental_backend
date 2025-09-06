@@ -30,18 +30,18 @@ async function getSpecificAdmin(email?: string, ownername?: string) {
   return findAdmin;
 }
 async function updateAdmin(
-  ownername?: string,
-  email?: string,
-  passowrd?: string,
+  ownername: string,
+  email: string,
+  passowrd: string,
   role?: Role
 ) {
   const update = await prisma.admin.update({
     where: {
       email: email,
+      passowrd: passowrd,
     },
     data: {
       ownername: ownername,
-      passowrd: passowrd,
       role: role,
     },
   });

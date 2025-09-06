@@ -17,6 +17,7 @@ async function checkRefreshToken(refreshToken: string) {
     select: {
       email: true,
       password: true,
+      role: true,
     },
   });
   console.log("modal refresh token data:", checkRefresh);

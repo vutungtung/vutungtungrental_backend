@@ -13,12 +13,15 @@ enum vechileType {
 }
 
 model User {
-  userId          Int           @id @default(autoincrement())
-  username        String        @unique
-  email           String        @unique
-  verified        Boolean       @default(false)
-  otpVerify       String?       @default("")
+  userId          Int       @id @default(autoincrement())
+  username        String    @unique
+  email           String    @unique
+  verified        Boolean   @default(false)
+  otpVerify       String?   @default("")
   otpExpired      DateTime?
+  updateOtp       String?
+  updateOtpExpire DateTime?
+
   resetOtp        String?       @default("")
   resetOtpExpired DateTime?
   password        String
