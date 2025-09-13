@@ -10,12 +10,21 @@ import session from "express-session";
 import resetPasswordRouter from "./Router/resetPasswordRoutes";
 import path from "path";
 import { getVehicleById, getVehicles } from "./Modal/vehicleModal";
+import cors from "cors";
+// import axios from "axios";
 dotenv.config();
 
 const app = express();
 const PORT = 4000;
 dotenv.config();
-
+// app.use(axios);
+// ✅ CORS configuration
+app.use(
+  cors({
+    origin: "http://localhost:5173", // change if your frontend runs on 5173
+    credentials: true, // allow cookies, authorization headers
+  })
+);
 app.use(cookieParser());
 app.use(express.json());
 app.use(

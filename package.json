@@ -1,6 +1,6 @@
 {
   "scripts": {
-    "dev": "tsx --watch src/main.ts",
+    "backend": "tsx --watch src/main.ts",
     "production": "npm run build && npm run start",
     "build": "tsc",
     "start": "node dist/main.js",
@@ -10,9 +10,12 @@
   "dependencies": {
     "@prisma/client": "^6.10.1",
     "@types/bcrypt": "^6.0.0",
+    "@types/cors": "^2.8.19",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/nodemailer": "^7.0.1",
+    "axios": "^1.11.0",
     "cookie-parser": "^1.4.7",
+    "cors": "^2.8.5",
     "dotenv": "^16.5.0",
     "express": "^5.1.0",
     "express-session": "^1.18.2",
