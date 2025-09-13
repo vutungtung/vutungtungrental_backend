@@ -99,6 +99,20 @@ async function getUserByUsername(username: string) {
   });
   return data;
 }
+// get user by id
+async function getUserByIdModal(userId: number) {
+  const getUser = await prisma.user.findUnique({
+    where: {
+      userId: userId,
+    },
+    select: {
+      username: true,
+      role: true,
+      email: true,
+    },
+  });
+  return getUser;
+}
 // exprt function
 export {
   createUser,
@@ -108,4 +122,5 @@ export {
   getUserByEmail,
   pendingUserModal,
   getUserByUsername,
+  getUserByIdModal,
 };

@@ -3,6 +3,7 @@ import {
   createUserController,
   deleteUserController,
   getAllUserController,
+  getUserByIdController,
   updateUserController,
 } from "../Controller/userController";
 import { getAllAdmin } from "../Modal/adminModal";
@@ -24,6 +25,7 @@ userRouter.post("/verify-otp", verifyOtpController);
 userRouter.post("/ressend-otp", resendOtpController);
 
 userRouter.get("/", authenMiddleware, getAllUserController);
+userRouter.get("/:id", getUserByIdController);
 
 userRouter.put("/update", authenMiddleware, updateUserController);
 userRouter.post(
