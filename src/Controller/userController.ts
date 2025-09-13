@@ -4,6 +4,7 @@ import {
   deleteUserModal,
   getALlUserMdoal,
   getUserByEmail,
+  getUserByIdModal,
   getUserByUsername,
   pendingUserModal,
   updateUserModal,
@@ -184,10 +185,35 @@ const deleteUserController = async (req: Request, res: Response) => {
     });
   }
 };
-
+// get user by id
+const getUserByIdController = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const userId = Number(id);
+    const getUser = await getUserByIdModal(userId);
+    if (!getUser) {
+      res.status(400).json({
+        message: "Failed to get the user:",
+        isSuccess: false,
+      });
+      return;
+    }
+    res.status(200).json({
+      message: "User data",
+      data: getUser,
+    });
+    return;
+  } catch (err) {
+    res.status(500).json({
+      message: "Failed to get the user",
+    });
+    return;
+  }
+};
 export {
   createUserController,
   getAllUserController,
   updateUserController,
   deleteUserController,
+  getUserByIdController,
 };
