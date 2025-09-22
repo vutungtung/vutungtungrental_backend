@@ -49,7 +49,7 @@ export const resetPasswordController = {
         return;
       }
       const hashedPassword = await hashPassword(newPassword);
-      console.log("this is hashed passowrd:", hashedPassword);
+      // console.log("this is hashed passowrd:", hashedPassword);
       // Call the reset password service
       const result = await resetPasswordService.resetPassword(
         hashedPassword,

@@ -17,7 +17,7 @@ async function pendingUserModal(data: {
       role: data.role,
     };
   } catch (error) {
-    console.log("pending user error:", error);
+    // console.log("pending user error:", error);
     return null;
   }
 }
@@ -52,7 +52,7 @@ async function createUser(data: {
 
 async function getALlUserMdoal() {
   const getusers = await prisma.user.findMany();
-  console.log("get all users datas:", getusers);
+  // console.log("get all users datas:", getusers);
   return getusers;
 }
 async function updateUserModal(data: {

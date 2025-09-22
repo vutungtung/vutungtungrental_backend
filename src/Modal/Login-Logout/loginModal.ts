@@ -13,7 +13,7 @@ async function careeteLoginModal(data: {
   password: string;
   role: Role;
 }) {
-  console.log("data in the model:", data.adminId, data.email);
+  // console.log("data in the model:", data.adminId, data.email);
   const create = prisma.login.createMany({
     data: {
       userId: data.userId,
@@ -24,7 +24,7 @@ async function careeteLoginModal(data: {
       role: data.role,
     },
   });
-  console.log("data to be stored in the database:", create);
+  // console.log("data to be stored in the database:", create);
   return create;
 }
 
@@ -51,7 +51,7 @@ async function checkExistingUser(email: string) {
     },
   });
 
-  console.log(findUser);
+  // console.log(findUser);
   return findUser;
 }
 async function checkExistingAdmin(email: string): Promise<any> {
