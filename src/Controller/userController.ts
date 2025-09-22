@@ -85,14 +85,14 @@ const createUserController = async (req: Request, res: Response) => {
 const getAllUserController = async (req: Request, res: Response) => {
   try {
     const getData = await getALlUserMdoal();
-    console.log("get all user data controler:", getData);
+    // console.log("get all user data controler:", getData);
     if (!getData) {
       res.status(400).json({ message: "cannot get the data" });
     }
     res.status(200).json(getData);
     return;
   } catch (err) {
-    console.log("catch block error:", err);
+    // console.log("catch block error:", err);
     res.status(500).json({
       message: "No data found",
     });
@@ -113,7 +113,7 @@ const updateUserController = async (req: Request, res: Response) => {
 
     if (data?.role === "user") {
       const update = await updateUserModal({ email, password, name });
-      console.log(update);
+      // console.log(update);
       res.status(200).json({
         message: "User Updated:",
         data: update,
@@ -133,7 +133,7 @@ const updateUserController = async (req: Request, res: Response) => {
       isSuccess: false,
     });
   } catch (err) {
-    console.log(err);
+    // console.log(err);
     res.status(500).json({
       message: "unable to update",
     });
@@ -169,7 +169,7 @@ const deleteUserController = async (req: Request, res: Response) => {
 
     // check user and passeword and delete
     const deleteUser = await deleteUserModal(email);
-    console.log("delet data of user:", deleteUser);
+    // console.log("delet data of user:", deleteUser);
     if (!deleteUser) {
       res.status(404).json({
         message: "Unable to delete the user",
@@ -179,7 +179,7 @@ const deleteUserController = async (req: Request, res: Response) => {
       message: "User deleted",
     });
   } catch (err) {
-    console.log("data delete error:", err);
+    // console.log("data delete error:", err);
     res.status(500).json({
       message: "unable to delete the user",
     });

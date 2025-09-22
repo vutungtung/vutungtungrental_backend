@@ -56,7 +56,7 @@ const createBookingController = async (req: Request, res: Response) => {
       });
     }
     const vehicleName = String(vech?.name);
-    console.log("This is the vehicle name ", vehicleName);
+    // console.log("This is the vehicle name ", vehicleName);
     const categId = Number(categoryId);
     const catName = await getCategoryById(categId);
     const categoryName = String(catName?.name);
@@ -223,7 +223,7 @@ const createBookingController = async (req: Request, res: Response) => {
     );
     return;
   } catch (err) {
-    console.log("Rent the vehicle error:", err);
+    // console.log("Rent the vehicle error:", err);
     res.status(500).json({
       message: "Failed to rent the vehicle",
       success: false,
@@ -261,7 +261,7 @@ const findAllBookingController = async (req: Request, res: Response) => {
     });
     return;
   } catch (err) {
-    console.log("get all bookings error:", err);
+    // console.log("get all bookings error:", err);
     res.status(404).json({
       message: "Failed to get the bookings",
     });
@@ -310,7 +310,7 @@ const getBookingDetailsById = async (req: Request, res: Response) => {
       data: getBookingDetail,
     });
   } catch (err) {
-    console.log("getBooking details by booking id error:", err);
+    // console.log("getBooking details by booking id error:", err);
     res.status(500).json({
       message: "Failed to View the details",
       data: err,

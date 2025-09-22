@@ -14,7 +14,7 @@ const createAdmin = async (
   res: Response
 ) => {
   try {
-    console.log("data entered:", username, email, password);
+    // console.log("data entered:", username, email, password);
     if ((username || email || password) === null) {
       res.status(401).json({
         message: "Enter all data to register",
@@ -37,7 +37,7 @@ const createAdmin = async (
       isSuccess: true,
     });
   } catch (err) {
-    console.log("This is the error", err);
+    // console.log("This is the error", err);
     res.status(500).json({
       message: "Server Error: Unable to create the admin",
       isSuccess: false,

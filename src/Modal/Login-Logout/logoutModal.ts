@@ -1,10 +1,9 @@
 import { prisma } from "../../db";
 
-async function logoutUserModal(email: string, password: string) {
-  const logout = await prisma.login.deleteMany({
+async function logoutUserModal(token: string) {
+  const logout = await prisma.login.delete({
     where: {
-      email: email,
-      password: password,
+      refreshToken: token,
     },
   });
   return logout;
@@ -18,6 +17,7 @@ async function checkRefreshToken(refreshToken: string) {
       email: true,
       password: true,
       role: true,
+      refreshToken: true,
     },
   });
   console.log("modal refresh token data:", checkRefresh);

@@ -25,7 +25,7 @@ export const verifyOtpController = async (req: Request, res: Response) => {
     if (data.role === "admin") {
       const newAdmin = await createOwner(req.session.pendingUserData);
     }
-    console.log("data to be store in table", data);
+    // console.log("data to be store in table", data);
 
     const newUser = await createUser(req.session.pendingUserData);
 
