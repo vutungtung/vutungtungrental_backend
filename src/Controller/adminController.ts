@@ -91,3 +91,4 @@ const findAdminByEmail = async (req: Request, res: Response) => {
 };
 
 export { createAdmin, getAdminController, findAdminByEmail };
+// export { createAdmin, getAdminController, findAdminByEmail };
