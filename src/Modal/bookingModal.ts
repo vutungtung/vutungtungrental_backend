@@ -17,7 +17,7 @@ async function createBooking(data: {
   licenseImg?: string | null;
   username: string;
 }) {
-  console.log("data to be store:", data);
+  // console.log("data to be store:", data);
   const book = await prisma.bookingInfo.create({
     data: {
       bookingDate: data.bookingDate,
@@ -100,7 +100,7 @@ async function getUserBookingModal(email: string) {
     });
     return searchUserBooking;
   } catch (err) {
-    console.log("User booking details error:", err);
+    // console.log("User booking details error:", err);
   }
 }
 // cancel booking
