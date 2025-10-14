@@ -158,6 +158,16 @@ async function getVehicleForBooking(vehicleId: number) {
   });
   return data;
 }
+async function updateBookingPaymentModal(id: number) {
+  return await prisma.bookingInfo.update({
+    where: {
+      bookingId: id,
+    },
+    data: {
+      paymentStatus: "completed",
+    },
+  });
+}
 export {
   createBooking,
   getAllBookingModal,
@@ -165,4 +175,5 @@ export {
   cancelBookingModal,
   getBookingDetailByIdModal,
   getVehicleForBooking,
+  updateBookingPaymentModal,
 };

@@ -6,6 +6,7 @@ import {
   findAllBookingController,
   getBookingDetailsById,
   getUserBookingDetailsController,
+  updateBookingPayment,
 } from "../Controller/bookingController";
 import { upload } from "../middleware/bookingMulterMiddleware";
 
@@ -40,5 +41,10 @@ http: bookingRouter.post(
   "/cancel-booking/:bookingId",
   authenMiddleware,
   cancelBookingController
+);
+bookingRouter.put(
+  "/bookingdetails/updatepayment/:bookingId",
+
+  updateBookingPayment
 );
 export { bookingRouter };
