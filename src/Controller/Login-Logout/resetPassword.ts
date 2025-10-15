@@ -35,7 +35,7 @@ export const resetPasswordController = {
   async resetPassword(req: Request, res: Response) {
     try {
       const { newPassword, confirmPassword } = req.body;
-
+      console.log(newPassword, confirmPassword);
       // Check if passwords match
       if (newPassword !== confirmPassword) {
         res.status(400).json({

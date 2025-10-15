@@ -162,8 +162,10 @@ async function updateBookingPaymentModal(id: number) {
   return await prisma.bookingInfo.update({
     where: {
       bookingId: id,
+      paymentMethod: "cashOnDelivery",
     },
     data: {
+      deliverystatus: "dilivered",
       paymentStatus: "completed",
     },
   });
