@@ -105,7 +105,6 @@ export async function updateVehicle(
     if (data.vin) updateData.vin = data.vin;
     if (data.mileage !== undefined) updateData.mileage = data.mileage;
     if (data.description) updateData.description = data.description;
-    if (data.transmissionType) updateData.transmission = data.transmissionType;
     if (data.image !== undefined) updateData.image = data.image;
     if (data.image1 !== undefined) updateData.image1 = data.image1;
     if (data.image2 !== undefined) updateData.image2 = data.image2;

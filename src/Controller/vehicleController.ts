@@ -147,9 +147,6 @@ if(logInfo?.role!=="admin"){
     const files: any = req.files;
     const image = files?.image?.[0]?.filename ?? req.body.image ?? undefined;
     const image1 = files?.image1?.[0]?.filename ?? req.body.image1 ?? undefined;
-    const image2 = files?.image2?.[0]?.filename ?? req.body.image2 ?? undefined;
-    const data = { ...req.body, image, image1, image2 };
-    const vehicle = await updateVehicle(v_id, data);
     res.status(200).json(vehicle);
   } catch (error) {
     console.error(error);
