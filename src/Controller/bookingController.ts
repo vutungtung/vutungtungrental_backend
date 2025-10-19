@@ -6,6 +6,7 @@ import {
   getBookingDetailByIdModal,
   getUserBookingModal,
   getVehicleForBooking,
+  updateBookingPaymentModal,
 } from "../Modal/bookingModal";
 import { checkformRefreshToken } from "../Modal/Login-Logout/loginModal";
 import { getUserByEmail } from "../Modal/userModal";
@@ -288,10 +289,12 @@ const getUserBookingDetailsController = async (req: Request, res: Response) => {
       message: "Your Bookings",
       data: getUserBooking,
     });
+    return;
   } catch (err) {
     res.status(500).json({
       message: "Failed to get booking",
     });
+    return;
   }
 };
 
@@ -309,12 +312,14 @@ const getBookingDetailsById = async (req: Request, res: Response) => {
       message: "Booking details:",
       data: getBookingDetail,
     });
+    return;
   } catch (err) {
     // console.log("getBooking details by booking id error:", err);
     res.status(500).json({
       message: "Failed to View the details",
       data: err,
     });
+    return;
   }
 };
 
@@ -590,10 +595,57 @@ const cancelBookingController = async (req: Request, res: Response) => {
     return;
   }
 };
+const updateBookingPayment = async (req: Request, res: Response) => {
+  try {
+    const { bookingId } = req.params;
+    if (!bookingId) {
+      res.status(400).json({ message: "Booking id is required" });
+      return;
+    }
+    const id = Number(bookingId);
+    const logindata = req.cookies["refresh_token"];
+    const findUser = await checkformRefreshToken(logindata);
+    if (findUser?.role === "user") {
+      res.status(400).json({
+        isSuccess: false,
+        message: "user cannot update the payment status",
+      });
+      return;
+    }
+    const bookingExist = await getBookingDetailByIdModal(id);
+    if (!bookingExist) {
+      res.status(400).json({
+        isSuccess: false,
+        message: "No booking found",
+      });
+      return;
+    }
+    const updatePaymentStatus = await updateBookingPaymentModal(id);
+    if (!updatePaymentStatus) {
+      res.status(400).json({
+        isSuccess: false,
+        message: "Failed to update the payment status",
+      });
+      return;
+    }
+    res.status(200).json({
+      isSuccess: true,
+      message: "The payemnt in updated to complete",
+    });
+    return;
+  } catch (err) {
+    res.status(500).json({
+      isSuccess: false,
+      message: "Unexpected Error:Failed to Updated",
+    });
+    return;
+  }
+};
 export {
   createBookingController,
   findAllBookingController,
   getUserBookingDetailsController,
   cancelBookingController,
   getBookingDetailsById,
+  updateBookingPayment,
 };

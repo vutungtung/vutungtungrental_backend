@@ -178,9 +178,9 @@ export const resetPasswordService = {
       throw new Error("OTP expired");
 
     session.otpVerified = true;
+    console.log("session verified----", session.otpVerified);
     return { message: "OTP verified successfully" };
   },
-
   async resetPassword(newPassword: string, session: any) {
     if (!session.resetEmail) throw new Error("Session expired");
     if (!session.otpVerified) throw new Error("OTP not verified");
