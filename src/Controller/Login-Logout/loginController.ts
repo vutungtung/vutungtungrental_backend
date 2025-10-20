@@ -53,8 +53,9 @@ const loginUser = async (req: Request, res: Response) => {
     }
 
     // Check if already logged in
-    const loggedIn = await checkAlreadyLoggedIn(email);
-    if (loggedIn) {
+    // const loggedIn = await checkAlreadyLoggedIn(email);
+    const getrefreshToken = req.cookies["refresh_token"];
+    if (getrefreshToken) {
       res.status(401).json({ message: "Cannot login twice" });
       return;
     }
