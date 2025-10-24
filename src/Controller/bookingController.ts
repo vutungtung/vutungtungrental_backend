@@ -25,6 +25,7 @@ const createBookingController = async (req: Request, res: Response) => {
       pickuplocation,
       droplocation,
       paymentMethod,
+      paymentStatus,
     } = req.body;
 
     const licenseImg = req.file
@@ -79,6 +80,7 @@ const createBookingController = async (req: Request, res: Response) => {
       username,
       vehicleName,
       categoryName,
+      paymentStatus,
     });
     res.status(200).json({
       message: "Rented vehicle Success",

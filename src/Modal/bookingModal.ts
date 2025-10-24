@@ -16,6 +16,7 @@ async function createBooking(data: {
   licenseNo: string;
   licenseImg?: string | null;
   username: string;
+  paymentStatus?: Payment;
 }) {
   // console.log("data to be store:", data);
   const book = await prisma.bookingInfo.create({
@@ -34,6 +35,7 @@ async function createBooking(data: {
       pickuplocation: data.pickuplocation,
       droplocation: data.droplocation,
       licenseNo: data.licenseNo,
+      paymentStatus: data.paymentStatus as Payment,
     },
   });
   const updateVehiclStatus = await prisma.vehicle.update({
