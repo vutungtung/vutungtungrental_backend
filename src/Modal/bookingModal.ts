@@ -170,6 +170,19 @@ async function updateBookingPaymentModal(id: number) {
     },
   });
 }
+async function updatdeDevliveryStatusModal(
+  bookingId: number,
+  status: DeliveryStatus
+) {
+  return await prisma.bookingInfo.update({
+    where: {
+      bookingId: bookingId,
+    },
+    data: {
+      deliverystatus: status,
+    },
+  });
+}
 export {
   createBooking,
   getAllBookingModal,
@@ -178,4 +191,5 @@ export {
   getBookingDetailByIdModal,
   getVehicleForBooking,
   updateBookingPaymentModal,
+  updatdeDevliveryStatusModal,
 };

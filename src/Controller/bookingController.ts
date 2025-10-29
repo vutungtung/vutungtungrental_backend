@@ -6,6 +6,7 @@ import {
   getBookingDetailByIdModal,
   getUserBookingModal,
   getVehicleForBooking,
+  updatdeDevliveryStatusModal,
   updateBookingPaymentModal,
 } from "../Modal/bookingModal";
 import { checkformRefreshToken } from "../Modal/Login-Logout/loginModal";
@@ -641,6 +642,56 @@ const updateBookingPayment = async (req: Request, res: Response) => {
     return;
   }
 };
+const updatdeDevliveryStatus = async (req: Request, res: Response) => {
+  try {
+    const { bookingId } = req.params;
+    const { status } = req.body;
+    if (!bookingId) {
+      res.status(400).json({ message: "Booking id is required" });
+      return;
+    }
+    const id = Number(bookingId);
+    const logindata = req.cookies["refresh_token"];
+    const findUser = await checkformRefreshToken(logindata);
+    if (findUser?.role === "user") {
+      res.status(400).json({
+        isSuccess: false,
+        message: "user cannot update the delivery status",
+      });
+      return;
+    }
+    const bookingExist = await getBookingDetailByIdModal(id);
+    if (!bookingExist) {
+      res.status(400).json({
+        isSuccess: false,
+        message: "No booking found",
+      });
+      return;
+    }
+    const updatdeDevliveryStatus = await updatdeDevliveryStatusModal(
+      id,
+      status
+    );
+    if (!updatdeDevliveryStatus) {
+      res.status(400).json({
+        isSuccess: false,
+        message: "Failed to update the delivery status",
+      });
+      return;
+    }
+    res.status(200).json({
+      isSuccess: true,
+      message: "The delivery status in updated ",
+    });
+    return;
+  } catch (err) {
+    res.status(500).json({
+      isSuccess: false,
+      message: "Unexpected Error:Failed to Updated",
+    });
+    return;
+  }
+};
 export {
   createBookingController,
   findAllBookingController,
@@ -648,4 +699,5 @@ export {
   cancelBookingController,
   getBookingDetailsById,
   updateBookingPayment,
+  updatdeDevliveryStatus,
 };
