@@ -9,6 +9,7 @@
     "prisma:reset": "npx prisma migrate reset"
   },
   "dependencies": {
+    "@getbrevo/brevo": "^3.0.1",
     "@prisma/client": "^6.10.1",
     "@types/bcrypt": "^6.0.0",
     "@types/jsonwebtoken": "^9.0.10",
