@@ -6,7 +6,7 @@ const transporter = nodemailer.createTransport({
 host: process.env.SMTP_HOST || "smtp-relay.brevo.com", // Changed
   port: process.env.SMTP_PORT ? parseInt(process.env.SMTP_PORT, 10) : 587, // Changed, ensure string before parseInt
   secure: (process.env.SMTP_PORT === '465'),   
-use TLS
+
   auth: {
     user: process.env.SMTP_USER,
     pass: process.env.SMTP_PASSWORD,
