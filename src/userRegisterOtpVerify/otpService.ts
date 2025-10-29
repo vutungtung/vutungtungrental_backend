@@ -1,4 +1,4 @@
-import transporter from "./nodeMailer";
+import { sendMail } from "./nodeMailer";
 
 export const otpService = {
   generateOtp: () => String(Math.floor(100000 + Math.random() * 900000)),
@@ -138,7 +138,7 @@ export const otpService = {
 </body>
         `,
       };
-      await transporter.sendMail(mailOptions);
+      await sendMail(mailOptions);
       return { success: true };
     } catch (err) {
       console.error("Error sending OTP email:", err);
