@@ -22,11 +22,7 @@ export const updatePasswordService = {
     // Save email in session
     session.resetEmail = email;
     session.otpVerified = false;
-
-    await sendMail(
-      email,
-      "Password Update OTP",
-      ` <title>Password Update OTP</title>
+    let html = ` <title>Password Update OTP</title>
     <style>
         /* Reset CSS for email compatibility */
         body, table, td, a {
@@ -153,8 +149,12 @@ export const updatePasswordService = {
         </tr>
     </table>
 </body>
-        `
-    );
+        `;
+    let to = email;
+
+    let subject = "Password Update OTP";
+    const data = { html, to, subject };
+    await sendMail(data);
     return { message: "OTP sent successfully" };
   },
 

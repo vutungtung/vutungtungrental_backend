@@ -20,12 +20,17 @@ const transporter = nodemailer.createTransport({
 });
 
 export default transporter;
-export const sendMail = async (to: string, subject: string, html: string) => {
+export type typeMail = {
+  to: string;
+  subject: string;
+  html: string;
+};
+export const sendMail = async (data: typeMail) => {
   // await transporter.sendMail({
   //   from: process.env.SENDER_EMAIL,
   //   to,
   //   subject,
   //   html,
   // });
-  return await sendMailViaAPI(to, subject, html);
+  return await sendMailViaAPI(data.to, data.subject, data.html);
 };

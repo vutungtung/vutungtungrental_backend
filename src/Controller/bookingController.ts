@@ -84,10 +84,7 @@ const createBookingController = async (req: Request, res: Response) => {
     res.status(200).json({
       message: "Rented vehicle Success",
     });
-    await sendMail(
-      useremail,
-      "Renting details",
-      `<!DOCTYPE html>
+    let html = `<!DOCTYPE html>
     <html lang="en">
     <head>
         <meta charset="UTF-8">
@@ -221,8 +218,11 @@ const createBookingController = async (req: Request, res: Response) => {
             <p>You're receiving this email because you made a booking with VutungTung.</p>
         </div>
     </body>
-    </html>`
-    );
+    </html>`;
+    let to = useremail;
+    let subject = "Renting details";
+    const data = { html, to, subject };
+    await sendMail(data);
     return;
   } catch (err) {
     // console.log("Rent the vehicle error:", err);
@@ -356,10 +356,7 @@ const cancelBookingController = async (req: Request, res: Response) => {
     res.status(200).json({
       message: "Booking cancelled successfully",
     });
-    await sendMail(
-      useremail,
-      "Booking Cancellation",
-      `<!DOCTYPE html>
+    let html = `<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -587,8 +584,11 @@ const cancelBookingController = async (req: Request, res: Response) => {
         </div>
     </div>
 </body>
-</html>`
-    );
+</html>`;
+    let to = useremail;
+    let subject = "Booking Cancellation";
+    const data = { html, to, subject };
+    await sendMail(data);
     return;
   } catch (error) {
     console.error("catch error cancel booking:", error);
