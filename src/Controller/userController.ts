@@ -44,6 +44,13 @@ const createUserController = async (req: Request, res: Response) => {
       });
       return;
     }
+    const emailExist = await getUserByEmail(email);
+    if (emailExist) {
+      res.status(400).json({
+        message: "Email already exist",
+        isSuccess: false,
+      });
+    }
     const hashedPassword = await hashPassword(password);
 
     const pendingUserData = await pendingUserModal({
