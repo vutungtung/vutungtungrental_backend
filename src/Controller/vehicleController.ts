@@ -53,6 +53,10 @@ export async function createVehicleController(req: Request, res: Response) {
       res.status(400).json({ error: "Vehicle name is required" });
       return;
     }
+    console.log("License plate --->", licensePlate);
+    console.log("License plate --->", typeof categoryId);
+    const cat = parseInt(categoryId);
+    console.log("category id --->", cat);
 
     const vehicle = await createVehicle({
       name,
@@ -68,11 +72,12 @@ export async function createVehicleController(req: Request, res: Response) {
       image1,
       image2,
       dailyRate: dailyRate ? Number(dailyRate) : 0,
-      categoryId: categoryId ? Number(categoryId) : undefined,
+      categoryId: cat,
       seatingCapacity: seatingCapacity ? Number(seatingCapacity) : 0,
     });
 
     res.status(201).json(vehicle);
+    return;
   } catch (error) {
     console.error(error);
     res.status(500).json({
