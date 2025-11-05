@@ -23,10 +23,10 @@ export async function createVehicle(data: {
   image1?: string;
   image2?: string;
   dailyRate?: number;
-  categoryId?: number;
+  categoryId: number;
   seatingCapacity?: number;
 }) {
-  
+  console.log("data ---->", data);
   if (!data.name) throw new Error("Vehicle name is required");
 
   const vehicleData: any = {
