@@ -11,7 +11,7 @@ export const sendMailViaAPI = async (
       "https://api.brevo.com/v3/smtp/email",
       {
         sender: {
-          name: "Your App",
+          name: "Vutungtung-Rental",
           email: process.env.SENDER_EMAIL,
         },
         to: [{ email: to }],

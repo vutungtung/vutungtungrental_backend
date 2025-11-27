@@ -28,9 +28,7 @@ const createBookingController = async (req: Request, res: Response) => {
       paymentMethod,
     } = req.body;
 
-    const licenseImg = req.file
-      ? `/uploads/bookingLicense/${req.file.filename}`
-      : null;
+    const licenseImg = req.file ? `${req.file.filename}` : null;
     if (licenseImg === null) {
       res.status(400).json({
         message: "License required to rent",
@@ -225,7 +223,7 @@ const createBookingController = async (req: Request, res: Response) => {
     await sendMail(data);
     return;
   } catch (err) {
-    // console.log("Rent the vehicle error:", err);
+    console.log("Rent the vehicle error:", err);
     res.status(500).json({
       message: "Failed to rent the vehicle",
       success: false,
