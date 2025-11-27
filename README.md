@@ -177,4 +177,4 @@ For inquiries or issues, open a GitHub Issue or reach out directly.
 
 ⭐ If you like this project, please star the repo to show your support!
 
-🧱 Built with love and TypeScript 💙
+🧱 Built with love and TypeScript 💙----
